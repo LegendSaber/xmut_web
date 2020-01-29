@@ -8,7 +8,26 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',    
+      redirect: '/login'   
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('../views/login/index')
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: () => import('../views/register/index')
+    },
+    {
+      path: '/dashbord',
+      component: () => import('../views/layout/index'),
+      children: [{
+        path: '/',
+        name: 'Home',
+        component: () => import('../views/dashbord/index')
+      }]
     }
   ]
 })
