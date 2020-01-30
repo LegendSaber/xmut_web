@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <el-row>
-      <el-button type="primary" plain>
+  <div id="main">
+    <el-tag size="medium" type="primary" plain>
         我或许败北，或许迷失自己，
         或许哪里也抵达不了，
         或许我已失去一切，
@@ -10,14 +9,11 @@
         唯我一人蒙在鼓里，
         或许这里没有任何人把赌注下在我身上。
         无所谓。
-        有一点是明确的：至少我有值得等待,有值得寻求的东西。</el-button>
-    </el-row>
+        有一点是明确的：至少我有值得等待,有值得寻求的东西。</el-tag>
     <el-divider></el-divider>
-    <el-row>
-      <el-button type="danger" plain>——村上春树 《奇鸟行状录》</el-button>
-    </el-row>
+    <el-tag size="mini" type="danger" plain>——村上春树 《奇鸟行状录》</el-tag>
     <el-divider></el-divider>
-    <el-carousel :interval="2000" type="card" height="300px">
+    <el-carousel :interval="2000" type="card" height="600px">
       <el-carousel-item>
         <img src="../../assets/1.png"/>
       </el-carousel-item>
@@ -43,6 +39,11 @@
 <script>
 </script>
 <style>
+#main {
+  width: 1000px;
+  height: 1000px;
+  margin: 0 auto;
+}
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;

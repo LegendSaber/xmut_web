@@ -1,14 +1,16 @@
 <template>
   <el-container style="height: 100%; border: 1px solid #eee">
-      <el-header style="text-align: right; font-size: 12px;">
+      <el-header style="text-align: right; font-size: 20px;">
         <origin-header></origin-header>
       </el-header>
-      <origin-main></origin-main>
+      <el-main>
+        <origin-main></origin-main>
+      </el-main>
   </el-container>
 </template>
 <script>
-import header from "./module/header";
-import main from "./module/main";
+import header from "./module/header"
+import main from "./module/main"
 export default {
   data() {
     return {
@@ -38,11 +40,8 @@ export default {
 </script>
 <style>
 .el-header {
-    background-color: #B3C0D1;
+    background-color: #B3C0D1;;
     color: #333;
     line-height: 60px;
-}
-.el-aside {
-   color: #333;
 }
 </style>
