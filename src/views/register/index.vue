@@ -21,7 +21,7 @@
           placeholder="确认密码"
         ></el-input>
       </el-form-item>
-      <el-select v-model="value" placeholder="请选择">
+      <el-select v-model="registerForm.value" placeholder="请选择">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -40,7 +40,7 @@
     </el-form>
   </div>
 </template>
- 
+
 <script>
 export default {
   name: "Register",
@@ -49,39 +49,55 @@ export default {
       registerForm: {
         username: "",
         password: "",
-        repPassword: ""
+        repPassword: "",
+        value: 1
       },
-      responseResult: [],
       options: [
         {
-          value: "1",
+          value: 1,
           label: "研友"
         },
         {
-          value: "2",
+          value: 2,
           label: "路人"
         },
         {
-          value: "3",
+          value: 3,
           label: "开课老师"
         }
       ],
-      value: ""
     };
   },
   methods: {
     register() {
-      this.$axios
-        .post("/register", {
-          username: this.loginForm.username,
-          password: this.loginForm.password
+      if (this.registerForm.password != this.registerForm.repPassword){
+        this.$notify.error("两次密码输入不一致");
+      }else{
+        let params = {}
+        params.username = this.$data.registerForm.username
+        params.password = this.$data.registerForm.password
+        params.flag = this.$data.registerForm.value
+
+        this.$axios.post('/sysStudent/register', params)
+        .then(response => {
+          if (response && response.success){
+            this.$alert(response.message, '注册结果', {
+              confirmButtonText: '确定',
+                  callback: action => {  
+                    this.$router.push("/login")
+                  }
+            });   
+          } else {
+            this.$alert(response.message, '注册结果', {
+              confirmButtonText: '确定',
+                  callback: action => {
+                  }
+            });   
+          }   
         })
-        .then(successResponse => {
-          if (successResponse.data.code === 200) {
-            this.$router.replace({ path: "/login" });
-          }
-        })
-        .catch(failResponse => {});
+        .catch(error => {
+        });
+      }
     },
     toLogin() {
       this.$router.push("/login");

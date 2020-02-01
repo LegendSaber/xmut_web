@@ -8,7 +8,7 @@
       <el-form-item>
         <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
       </el-form-item>
-      <el-select v-model="value" placeholder="请选择">
+      <el-select v-model="loginForm.value" placeholder="请选择">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -35,40 +35,43 @@ export default {
     return {
       loginForm: {
         username: "",
-        password: ""
+        password: "",
+        value: 1
       },
-      responseResult: [],
       options: [
         {
-          value: "1",
+          value: 1,
           label: "研友"
         },
         {
-          value: "2",
+          value: 2,
           label: "路人"
         },
         {
-          value: "3",
+          value: 3,
           label: "开课老师"
         }
       ],
-      value: ""
     };
   },
   methods: {
     login() {
-        this.$router.push("/dashbord");
-    //   this.$axios
-    //     .post("/login", {
-    //       username: this.loginForm.username,
-    //       password: this.loginForm.password
-    //     })
-    //     .then(successResponse => {
-    //       if (successResponse.data.code === 200) {
-    //         this.$router.replace({ path: "/index" });
-    //       }
-    //     })
-    //     .catch(failResponse => {});
+        let params = {}
+        params.username = this.$data.loginForm.username
+        params.password = this.$data.loginForm.password
+        params.flag = this.$data.loginForm.value
+
+        this.$axios.post("/sysStudent/login", params)
+        .then (response => {
+          if (response && response.success){
+            window.sessionStorage.setItem('user', JSON.stringify(response.data))
+            this.$router.push("/dashbord")
+            this.$notify.success(response.message)
+          } else{
+            this.$notify.error(response.message)
+          }
+        }).catch (error => {
+        })
     },
     toRegister() {
       this.$router.push("/register");

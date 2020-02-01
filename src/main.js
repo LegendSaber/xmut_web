@@ -4,7 +4,7 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
-import {http} from './utils/http'
+import http from './utils/http'
 
 Vue.prototype.$axios = http
 Vue.prototype.$store = store

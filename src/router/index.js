@@ -3,8 +3,11 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+const layout = () => import('../views/layout/index');
+
 export default new Router({
   mode: "history",
+  base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
@@ -22,11 +25,20 @@ export default new Router({
     },
     {
       path: '/dashbord',
-      component: () => import('../views/layout/index'),
+      component: layout,
       children: [{
         path: '/',
         name: 'Home',
         component: () => import('../views/dashbord/index')
+      }]
+    },
+    {
+      path: '/sign',
+      component: layout,
+      children: [{
+        path: '/',
+        name: 'Sign',
+        component: () => import('../views/sys/sign/index')
       }]
     }
   ]

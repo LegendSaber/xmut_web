@@ -1,19 +1,21 @@
 <template>
   <div id="main">
-    <el-tag size="medium" type="primary" plain>
+    <el-tag  type="primary" plain>
         我或许败北，或许迷失自己，
         或许哪里也抵达不了，
-        或许我已失去一切，
+        </el-tag>
+    <el-tag  type="primary" plain> 或许我已失去一切，
         任凭怎么挣扎也只能徒呼奈何，
-        或许我只是徒然掬一把废墟灰烬，
-        唯我一人蒙在鼓里，
+        或许我只是徒然掬一把废墟灰烬，</el-tag>
+    <el-tag  type="primary" plain>唯我一人蒙在鼓里，
         或许这里没有任何人把赌注下在我身上。
         无所谓。
-        有一点是明确的：至少我有值得等待,有值得寻求的东西。</el-tag>
+        </el-tag>
+    <el-tag  type="primary" plain>    有一点是明确的：至少我有值得等待,有值得寻求的东西。</el-tag>
     <el-divider></el-divider>
-    <el-tag size="mini" type="danger" plain>——村上春树 《奇鸟行状录》</el-tag>
+    <el-button id="btn1" type="danger" plain>——村上春树 《奇鸟行状录》</el-button>
     <el-divider></el-divider>
-    <el-carousel :interval="2000" type="card" height="600px">
+    <el-carousel :interval="2000" type="card" height="300px">
       <el-carousel-item>
         <img src="../../assets/1.png"/>
       </el-carousel-item>
@@ -35,14 +37,20 @@
     </el-carousel>
   </div>
 </template>
-
 <script>
 </script>
 <style>
 #main {
   width: 1000px;
-  height: 1000px;
+  height: 800px;
   margin: 0 auto;
+}
+.el-tag {
+  font-size: 24px;
+}
+#btn1 {
+  font-size: 24px;
+  margin-left: 600px
 }
 .el-carousel__item h3 {
   color: #475669;

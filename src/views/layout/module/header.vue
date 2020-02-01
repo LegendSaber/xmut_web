@@ -16,8 +16,14 @@
        <el-button type="primary">搜索</el-button>
     </el-col>
     <el-col :span="6">
-        <i class="el-icon-user"></i>
-        <el-button type="primary" plain round>欢迎你, Master</el-button>  
+      <el-dropdown @command="handleCommand">
+          <i class="el-icon-setting"></i>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="user">个人中心</el-dropdown-item>
+            <el-dropdown-item command="logout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <span>{{username}}</span>  
         <el-badge value="new" class="item">
           <el-button type="warning" plain>评论</el-button>
         </el-badge>
@@ -32,12 +38,32 @@
     data() {
       return {
         activeName: 'first',
-        input: ""
+        input: "",
+        username: "",
+        currentUser: {}
       };
     },
     methods: {
-      handleClick(tab, event) {
-        console.log(tab, event);
+      created() {
+        alert("1111")
+        let currentUser = JSON.parse(window.sessionStorage.getItem('user'))
+        console.log(currentUser)
+        if (currentUser) {
+          this.$data.currentUser = currentUser
+          this.$data.username = this.$data.currentUser.username
+        }
+      },
+      handleCommand() {
+        if (command == "logout"){
+          
+        }
+      },
+      handleClick() {
+        if (this.activeName === "first" && this.$route.path != "/dashbord"){
+          this.$router.push("/dashbord");
+        } else if (this.activeName === "second" && this.$route.path != "/sign") {
+          this.$router.push("/sign")
+        }
       }
     }
   }
