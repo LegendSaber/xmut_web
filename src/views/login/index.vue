@@ -61,7 +61,7 @@ export default {
         params.password = this.$data.loginForm.password
         params.flag = this.$data.loginForm.value
 
-        this.$axios.post("/sysStudent/login", params)
+        this.$axios.post("/sysUser/login", params)
         .then (response => {
           if (response && response.success){
             window.sessionStorage.setItem('user', JSON.stringify(response.data))
@@ -75,6 +75,11 @@ export default {
     },
     toRegister() {
       this.$router.push("/register");
+    }
+  },
+  created() {
+    if (window.sessionStorage.getItem('user') != null) {
+      this.$router.push("/dashbord")
     }
   }
 }

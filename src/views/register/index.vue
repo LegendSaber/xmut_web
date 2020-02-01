@@ -78,7 +78,7 @@ export default {
         params.password = this.$data.registerForm.password
         params.flag = this.$data.registerForm.value
 
-        this.$axios.post('/sysStudent/register', params)
+        this.$axios.post('/sysUser/register', params)
         .then(response => {
           if (response && response.success){
             this.$alert(response.message, '注册结果', {

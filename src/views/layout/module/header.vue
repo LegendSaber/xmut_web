@@ -44,18 +44,21 @@
       };
     },
     methods: {
-      created() {
-        alert("1111")
-        let currentUser = JSON.parse(window.sessionStorage.getItem('user'))
-        console.log(currentUser)
-        if (currentUser) {
-          this.$data.currentUser = currentUser
-          this.$data.username = this.$data.currentUser.username
-        }
-      },
-      handleCommand() {
-        if (command == "logout"){
-          
+      handleCommand (command) {
+        if (command == "logout") {
+          this.$confirm("是否确定退出登录?", "提示", {
+            confirmButtonText: "退出",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+            this.$axios.get("/sysUser/logout", {}).then(response => {
+              if (response && response.success){
+                window.sessionStorage.removeItem('user')
+                this.$router.push("/")
+                this.$notify.success(response.message)
+              }
+            });
+          });
         }
       },
       handleClick() {
@@ -65,7 +68,16 @@
           this.$router.push("/sign")
         }
       }
-    }
+    },
+    created() {
+        let currentUser = JSON.parse(window.sessionStorage.getItem('user'))
+        if (currentUser) {
+          this.$data.currentUser = currentUser
+          this.$data.username = this.$data.currentUser.username
+        } else {
+          this.$router.push("/")
+        }
+    },
   }
 </script>
 <style>

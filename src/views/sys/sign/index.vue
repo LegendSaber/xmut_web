@@ -16,13 +16,32 @@ export default {
         return {
             value: new Date(),
             isSign: false,
+            currentUser: {}
         }
     },
     methods: {
         sign() {
-            this.$notify.success("签到成功！积分+1");
-            this.isSign = !this.isSign;
+            this.$axios.get("/sysSign/sign", {}).then(response => {
+                if (response && response.success){
+                    this.$notify.success(response.message);
+                    this.$router.push("/sign")
+                }
+            })       
         }
+    },
+    created() {
+        let currentUser = window.sessionStorage.getItem('user')
+        if (currentUser) {
+            this.$data.currentUser = currentUser
+        }
+
+        this.$axios.get("/sysSign/isSign", {}).then(response => {
+            if (response && response.success) {
+                this.$data.isSign = true
+            } else {
+                this.$data.isSign = false
+            }
+        })
     }
 }
 </script>
