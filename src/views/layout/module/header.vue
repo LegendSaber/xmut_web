@@ -66,7 +66,9 @@
           this.$router.push("/dashbord");
         } else if (this.activeName === "second" && this.$route.path != "/sign") {
           this.$router.push("/sign")
-        }
+        } else if (this.activeName == "third" && this.$route.path != "/forum") {
+          this.$router.push("/forum")
+        }  
       }
     },
     created() {

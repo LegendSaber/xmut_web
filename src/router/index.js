@@ -40,6 +40,15 @@ export default new Router({
         name: 'Sign',
         component: () => import('../views/sys/sign/index')
       }]
+    },
+    {
+      path: '/forum',
+      component: layout,
+      children: [{
+        path: '/',
+        name: 'Forum',
+        component: () => import('../views/sys/forum/index')
+      }]
     }
   ]
 })

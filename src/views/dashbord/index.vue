@@ -15,29 +15,18 @@
     <el-divider></el-divider>
     <el-button id="btn1" type="danger" plain>——村上春树 《奇鸟行状录》</el-button>
     <el-divider></el-divider>
-    <el-carousel :interval="2000" type="card" height="300px">
-      <el-carousel-item>
-        <img src="../../assets/1.png"/>
-      </el-carousel-item>
-      <el-carousel-item>
-        <img src="../../assets/2.png"/>
-      </el-carousel-item>
-      <el-carousel-item>
-        <img src="../../assets/3.png"/>
-      </el-carousel-item>
-      <el-carousel-item>
-        <img src="../../assets/4.png"/>
-      </el-carousel-item>
-      <el-carousel-item>
-        <img src="../../assets/5.png"/>
-      </el-carousel-item>
-      <el-carousel-item>
-        <img src="../../assets/6.png"/>
-      </el-carousel-item>
-    </el-carousel>
+    <carousel/>
   </div>
 </template>
 <script>
+  import carousel from "../carousel/index"
+
+  export default {
+    name: 'Dashbord',
+    components:{
+      carousel
+    }
+  }
 </script>
 <style>
 #main {

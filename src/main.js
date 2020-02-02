@@ -7,7 +7,6 @@ import store from './store'
 import http from './utils/http'
 
 Vue.prototype.$axios = http
-Vue.prototype.$store = store
 
 Vue.config.productionTip = false
 
