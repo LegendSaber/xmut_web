@@ -4,7 +4,9 @@
         <origin-header></origin-header>
       </el-header>
       <el-main>
-        <origin-main></origin-main>
+        <div id="main">
+          <origin-main></origin-main>
+        </div>
       </el-main>
   </el-container>
 </template>
@@ -13,26 +15,17 @@ import header from "./module/header"
 import main from "./module/main"
 export default {
   data() {
-    return {
-      screenWidth: document.body.clientWidth, // 屏幕宽度
-    };
+    return {}
   },
   components: {
     "origin-header": header,
     "origin-main": main
   },
   watch: {
-    screenWidth (val) {
-      this.screenWidth = val
-    }
+    
   },
   mounted() {
-    // 监听窗口大小
-    window.onresize = () => {
-      return (() => {
-        this.screenWidth = document.body.clientWidth
-      })()
-    }
+    
   },
   methods: {
   }
@@ -43,5 +36,10 @@ export default {
     background-color: #B3C0D1;
     color: #333;
     line-height: 60px;
+}
+#main{
+  width: 1000px;
+  height: 100%;
+  margin: 0 auto;
 }
 </style>

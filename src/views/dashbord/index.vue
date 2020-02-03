@@ -1,5 +1,5 @@
 <template>
-  <div id="main">
+  <div>
     <el-tag  type="primary" plain>
         我或许败北，或许迷失自己，
         或许哪里也抵达不了，
@@ -15,25 +15,19 @@
     <el-divider></el-divider>
     <el-button id="btn1" type="danger" plain>——村上春树 《奇鸟行状录》</el-button>
     <el-divider></el-divider>
-    <carousel/>
+    <o-carousel/>
   </div>
 </template>
 <script>
-  import carousel from "../carousel/index"
-
+  
   export default {
     name: 'Dashbord',
     components:{
-      carousel
+      
     }
   }
 </script>
 <style>
-#main {
-  width: 1000px;
-  height: 800px;
-  margin: 0 auto;
-}
 .el-tag {
   font-size: 24px;
 }

@@ -7,6 +7,7 @@ import getters from './getters'
 Vue.use(Vuex)
 
 const state = {
+    isPath: true
 }
 
 const store = new Vuex.Store({

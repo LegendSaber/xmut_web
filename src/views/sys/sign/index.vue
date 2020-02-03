@@ -1,5 +1,5 @@
 <template>
-    <div id="main">
+    <div>
         <el-row>
             <el-button v-if="!isSign" @click="sign" id="signBtn" type="danger" plain circle>签到</el-button>
             <el-button v-else id="signBtn" type="warning" circle plain>今日已签到</el-button>
@@ -47,11 +47,6 @@ export default {
 </script>
 
 <style scoped>
-#main {
-    width: 1000px;
-    height: 800px;
-    margin: 0 auto;
-}
 #signBtn {
     width: 280px;
     height: 180px;

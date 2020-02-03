@@ -54,20 +54,25 @@
             this.$axios.get("/sysUser/logout", {}).then(response => {
               if (response && response.success){
                 window.sessionStorage.removeItem('user')
-                this.$router.push("/")
                 this.$notify.success(response.message)
+                this.$router.push("/")
               }
             });
           });
         }
       },
       handleClick() {
+        if (this.activeName === "third"){
+          $store.state.isPath = true
+        } else {
+          $store.state.isPath = false
+        }
         if (this.activeName === "first" && this.$route.path != "/dashbord"){
           this.$router.push("/dashbord");
         } else if (this.activeName === "second" && this.$route.path != "/sign") {
           this.$router.push("/sign")
-        } else if (this.activeName == "third" && this.$route.path != "/forum") {
-          this.$router.push("/forum")
+        } else if (this.activeName === "third" && this.$route.path != "/forum") {
+         // this.$router.push("/forum")
         }  
       }
     },
@@ -77,6 +82,7 @@
           this.$data.currentUser = currentUser
           this.$data.username = this.$data.currentUser.username
         } else {
+          this.$notify.error("您还没登录，请先登录")
           this.$router.push("/")
         }
     },
