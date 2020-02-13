@@ -5,7 +5,6 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 import http from './utils/http'
-import infiniteScroll from 'vue-infinite-scroll'
 import components from './components/components.js'
 
 Vue.prototype.$axios = http
@@ -13,7 +12,6 @@ Vue.prototype.$axios = http
 Vue.config.productionTip = false
 
 Vue.use(components)
-Vue.use(infiniteScroll)
 Vue.use(ElementUI, {
   size: 'small',
   zIndex: 3000

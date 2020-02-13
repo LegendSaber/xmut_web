@@ -3,43 +3,67 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-const layout = () => import('../views/layout/index');
+const layout = () =>
+    import ('../views/layout/index');
 
 export default new Router({
-  mode: "history",
-  base: process.env.BASE_URL,
-  routes: [
-    {
-      path: '/',
-      redirect: '/login'   
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: () => import('../views/login/index')
-    },
-    {
-      path: '/register',
-      name: 'Register',
-      component: () => import('../views/register/index')
-    },
-    {
-      path: '/dashbord',
-      component: layout,
-      children: [{
-        path: '/',
-        name: 'Home',
-        component: () => import('../views/dashbord/index')
-      }]
-    },
-    {
-      path: '/sign',
-      component: layout,
-      children: [{
-        path: '/',
-        name: 'Sign',
-        component: () => import('../views/sys/sign/index')
-      }]
-    }
-  ]
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes: [{
+            path: '/',
+            redirect: '/login'
+        },
+        {
+            path: '/login',
+            name: 'Login',
+            component: () =>
+                import ('../views/login/index')
+        },
+        {
+            path: '/register',
+            name: 'Register',
+            component: () =>
+                import ('../views/register/index')
+        },
+        {
+            path: '/dashbord',
+            component: layout,
+            children: [{
+                path: '/',
+                name: 'Home',
+                component: () =>
+                    import ('../views/dashbord/index')
+            }]
+        },
+        {
+            path: '/sign',
+            component: layout,
+            children: [{
+                path: '/',
+                name: 'Sign',
+                component: () =>
+                    import ('../views/sys/sign/index')
+            }]
+        },
+        {
+            path: '/experience',
+            component: layout,
+            children: [{
+                path: '/',
+                name: 'Experience',
+                component: () =>
+                    import ('../views/sys/experience/index')
+            }]
+        },
+        {
+            path: '/detail',
+            component: layout,
+            children: [{
+                path: '/',
+                name: "Detail",
+                component: () =>
+                    import ('../views/sys/detail/index')
+            }]
+        }
+    ]
 })

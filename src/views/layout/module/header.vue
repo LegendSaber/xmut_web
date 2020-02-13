@@ -23,7 +23,7 @@
             <el-dropdown-item command="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <span>{{username}}</span>  
+        <span>{{currentUser.username}}</span>  
         <el-badge value="new" class="item">
           <el-button type="warning" plain>评论</el-button>
         </el-badge>
@@ -39,7 +39,6 @@
       return {
         activeName: 'first',
         input: "",
-        username: "",
         currentUser: {}
       };
     },
@@ -62,17 +61,12 @@
         }
       },
       handleClick() {
-        if (this.activeName === "third"){
-          $store.state.isPath = true
-        } else {
-          $store.state.isPath = false
-        }
         if (this.activeName === "first" && this.$route.path != "/dashbord"){
           this.$router.push("/dashbord");
         } else if (this.activeName === "second" && this.$route.path != "/sign") {
           this.$router.push("/sign")
-        } else if (this.activeName === "third" && this.$route.path != "/forum") {
-         // this.$router.push("/forum")
+        } else if (this.activeName === "third" && this.$route.path != "/experience") {
+          this.$router.push("/experience")
         }  
       }
     },
@@ -80,7 +74,6 @@
         let currentUser = JSON.parse(window.sessionStorage.getItem('user'))
         if (currentUser) {
           this.$data.currentUser = currentUser
-          this.$data.username = this.$data.currentUser.username
         } else {
           this.$notify.error("您还没登录，请先登录")
           this.$router.push("/")
