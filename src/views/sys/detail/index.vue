@@ -1,13 +1,10 @@
 <template>
-    
 </template>
-
 <script>
-export default {
-    name: "Detail"
-}
+  export default {
+    data() {
+      return {
+      };
+    }
+  };
 </script>
-
-<style scoped>
-
-</style>

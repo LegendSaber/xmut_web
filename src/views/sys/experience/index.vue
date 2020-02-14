@@ -27,7 +27,7 @@ export default {
   data() {
     return {
       tableData: [],
-      loading: false,
+      loading: true,
       queryData: {
         currentPage: 0,
         pageSize: 12,
@@ -51,43 +51,56 @@ export default {
 
       if (scrollTop + windowHeight == scrollHeight) {
         let params = {}
-        params.currentPage = 9
-        params.pageSize = 2
+        params.currentPage = this.$data.queryData.currentPage
+        params.pageSize = this.$data.queryData.pageSize
   
         this.$data.loading = true
-        this.$axios.post("/sysExperience/getAll", params).then(response => {
-          if (response && response.data){
-            console.log(response.data)
-          }
-        })
-        this.$data.loading = false
+        setTimeout(() => {
+          this.$axios.post("/sysExperience/getAll", params).then(response => {
+            if (response && response.data){
+              let data = response.data.records
+
+              if (data.length == 0){
+                this.$notify.error("没有更多数据")
+                window.removeEventListener("scroll", this.windowScroll)
+              } else {
+                data[0].modifyTime = data[0].modifyTime.slice(0, 10)
+                data[1].modifyTime = data[1].modifyTime.slice(0, 10)
+                this.$data.tableData.push(data[0])
+                this.$data.tableData.push(data[1])
+                this.$data.queryData.currentPage++
+              }
+            }
+          })
+          this.$data.loading = false
+        }, 2000)
       }
     }
   },
   mounted() {
-    window.addEventListener("scroll", this.windowScroll);
+    window.addEventListener("scroll", this.windowScroll)
   },
   created() {
-    let params = {};
-    params.currentPage = this.$data.queryData.currentPage;
-    params.pageSize = this.$data.queryData.pageSize;
+    let params = {}
+    params.currentPage = this.$data.queryData.currentPage
+    params.pageSize = this.$data.queryData.pageSize
     this.$axios.post("/sysExperience/getAll", params).then(response => {
       if (response && response.data) {
-        this.$data.tableData = response.data.records;
-        let length = this.$data.tableData.length;
-        console.log(response)
-        console.log(response.data)
+        this.$data.tableData = response.data.records
+        let length = this.$data.tableData.length
+        
         for (let i = 0; i < length; i++) {
-          this.$data.tableData[i].modifyTime = this.$data.tableData[i].modifyTime.slice(0, 10);
+          this.$data.tableData[i].modifyTime = this.$data.tableData[i].modifyTime.slice(0, 10)
         }
 
-        this.$data.queryData.currentPage = this.$data.queryData.pageSize
-        this.$data.queryData.pageSize = 2
+         this.$data.queryData.currentPage = (this.$data.queryData.pageSize / 2) + 1
+         this.$data.queryData.pageSize = 2
+         this.$data.loading = false
       }
     })
   },
   beforeDestroy() {
-    window.removeEventListener("scroll", this.windowScroll);
+    window.removeEventListener("scroll", this.windowScroll)
   }
 };
 </script>
