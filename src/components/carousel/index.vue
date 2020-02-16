@@ -1,22 +1,22 @@
 <template>
     <el-carousel :interval="2000" type="card" height="300px">
       <el-carousel-item>
-        <img src="@/assets/1.png"/>
+        <img src="@/assets/images/1.png"/>
       </el-carousel-item>
       <el-carousel-item>
-        <img src="@/assets/2.png"/>
+        <img src="@/assets/images/2.png"/>
       </el-carousel-item>
       <el-carousel-item>
-        <img src="@/assets/3.png"/>
+        <img src="@/assets/images/3.png"/>
       </el-carousel-item>
       <el-carousel-item>
-        <img src="@/assets/4.png"/>
+        <img src="@/assets/images/4.png"/>
       </el-carousel-item>
       <el-carousel-item>
-        <img src="@/assets/5.png"/>
+        <img src="@/assets/images/5.png"/>
       </el-carousel-item>
       <el-carousel-item>
-        <img src="@/assets/6.png"/>
+        <img src="@/assets/images/6.png"/>
       </el-carousel-item>
     </el-carousel>
 </template>

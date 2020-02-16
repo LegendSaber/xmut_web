@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100%; border: 1px solid #eee">
-      <el-header style="text-align: right; font-size: 20px;">
+      <el-header id="homeheader">
         <origin-header></origin-header>
       </el-header>
       <el-main>
@@ -32,13 +32,15 @@ export default {
 };
 </script>
 <style>
-.el-header {
+#homeheader {
     background-color: #B3C0D1;
     color: #333;
     line-height: 60px;
+    text-align: right;
+    font-size: 20px;
 }
 #main{
-  width: 1000px;
+  width: 55%;
   height: 100%;
   margin: 0 auto;
 }
