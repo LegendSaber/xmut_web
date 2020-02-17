@@ -5,10 +5,11 @@
     <el-tag style="margin-left:200px;fontSize: 28px" type="danger" plain>青春是一个短暂的美梦, 当你醒来时, 它早已消失无踪</el-tag>
     <el-divider />
     <el-button
-      @click="dialog = true"
+      @click="addExperience"
       type="primary"
       style="margin-bottom: 5px"
       icon="el-icon-circle-plus"
+      :loading="loading"
     >发表经验</el-button>
 
     <el-drawer
@@ -41,7 +42,7 @@
           <el-form-item>
             <div class="demo-drawer__footer">
               <el-button
-                :loading="loading"
+                :loading="dwloading"
                 type="primary"
                 @click="submitForm('ruleForm')"
               >{{ dwloading ? '提交中 ...' : '提交' }}</el-button>
@@ -54,24 +55,58 @@
     </el-drawer>
 
     <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
-      <el-tab-pane label="最新" name="new"></el-tab-pane>
-      <el-tab-pane label="热门" name="hot"></el-tab-pane>
-      <el-tab-pane label="收藏" name="collect"></el-tab-pane>
-      <el-tab-pane label="我的" name="my"></el-tab-pane>
+      <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
+      <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
+      <el-tab-pane :disabled="loading" label="收藏" name="collect"></el-tab-pane>
+      <el-tab-pane :disabled="loading" label="我的" name="my"></el-tab-pane>
     </el-tabs>
     <el-table
       :data="tableData"
       border
+      :row-class-name="tableRowClassName"
       style="width: 100%;fontSize:18px"
       v-loading="loading"
       element-loading-text="拼命加载中"
     >
-      <el-table-column fixed prop="modifyTime" label="日期" width="300"></el-table-column>
-      <el-table-column prop="author" label="作者" width="240"></el-table-column>
-      <el-table-column prop="title" label="标题" width="240"></el-table-column>
-      <el-table-column fixed="right" label="操作" width="150">
+      <el-table-column min-width="130" prop="createTime" label="日期"></el-table-column>
+      <el-table-column min-width="130" prop="author" label="作者"></el-table-column>
+      <el-table-column min-width="280" prop="title" label="标题"></el-table-column>
+      <el-table-column min-width="280" label="操作">
         <template slot-scope="scope">
-          <el-button @click="show(scope.row)" type="primary" plain>查看</el-button>
+          <el-button @click="show(scope.row)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
+          <el-button
+            v-if="queryData.flag == 1"
+            icon="el-icon-bell"
+            type="success"
+            plain
+          >更新日期:{{scope.row.modifyTime}}</el-button>
+          <el-button
+            v-if="queryData.flag == 2"
+            icon="el-icon-user"
+            type="warning"
+            plain
+          >收藏人数:{{scope.row.favorNum}}</el-button>
+          <el-button
+            v-if="queryData.flag == 3"
+            icon="el-icon-star-on"
+            @click="cancelCollect(scope.row)"
+            type="warning"
+            plain
+          >已收藏</el-button>
+          <el-button
+            v-if="queryData.flag == 4"
+            icon="el-icon-edit"
+            type="warning"
+            @click="editExperience(scope.row)"
+            plain
+          >编辑</el-button>
+          <el-button
+            v-if="queryData.flag == 4"
+            icon="el-icon-delete"
+            type="danger"
+            @click="deleteExperience(scope.row)"
+            plain
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,6 +121,7 @@ export default {
       tableData: [],
       loading: true,
       queryData: {
+        hasScroll: true,
         isScroll: false,
         flag: 1,
         currentPage: 0,
@@ -95,7 +131,8 @@ export default {
       dwloading: false,
       ruleForm: {
         title: "",
-        content: ""
+        content: "",
+        essayId: -1
       },
       rules: {
         title: [
@@ -120,6 +157,10 @@ export default {
     };
   },
   methods: {
+    addExperience() {
+      this.$data.ruleForm.essayId = -1;
+      this.$data.dialog = true;
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -127,23 +168,47 @@ export default {
           this.$data.dwloading = true;
           params.title = this.$data.ruleForm.title;
           params.content = this.$data.ruleForm.content;
-          setTimeout(() => {
-            this.$axios.post("/sysExperience/insert", params).then(response => {
-              this.$data.dwloading = false;
-              if (response && response.success) {
-                this.$alert(response.message, "提交结果", {
-                  confirmButtonText: "确定",
-                  callback: action => {
-                    this.resetForm("ruleForm");
-                    this.$data.dialog = false;
+          if (this.$data.ruleForm.essayId == -1) {
+            setTimeout(() => {
+              this.$axios
+                .post("/sysExperience/insert", params)
+                .then(response => {
+                  if (response && response.success) {
+                    this.$alert(response.message, "提交结果", {
+                      confirmButtonText: "确定",
+                      callback: action => {
+                        this.$data.dwloading = false;
+                        this.$data.dialog = false;
+                        this.resetForm("ruleForm");
+                        location.replace(location);
+                      }
+                    });
+                  } else {
+                    this.$notify.error(response.message);
+                    this.$data.dwloading = false;
                   }
                 });
-              } else {
-                this.$notify.error(response.message);
-                return false;
-              }
-            });
-          }, 2000);
+            }, 2000);
+          } else {
+            params.id = this.$data.ruleForm.essayId;
+            setTimeout(() => {
+              this.$axios
+                .post("/sysExperience/modifyExperience", params)
+                .then(response => {
+                  if (response && response.success) {
+                    this.$alert(response.message, "提交结果", {
+                      confirmButtonText: "确定",
+                      callback: action => {
+                        this.$data.dwloading = false;
+                        this.$data.dialog = false;
+                        this.resetForm("ruleForm");
+                        location.replace(location);
+                      }
+                    });
+                  }
+                });
+            }, 2000);
+          }
         } else {
           this.$alert("表单信息填写有误，请修改!", "提交结果", {
             confirmButtonText: "确定",
@@ -171,17 +236,12 @@ export default {
       this.$data.dialog = false;
     },
     categoryHandle() {
-      if (this.$data.loading) 
-      {
-        this.$data.categoryName = this.$data.oldCategory;
-        return;
-      }
       if (this.$data.oldCategory != this.$data.categoryName) {
         this.$data.queryData.currentPage = 0;
         this.$data.queryData.pageSize = 12;
-        this.$data.queryData.isScroll = false;
         this.$data.loading = true;
-        window.addEventListener("scroll", this.windowScroll);
+        this.$data.queryData.isScroll = false;
+
         if (this.$data.categoryName === "new") {
           this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
@@ -192,12 +252,14 @@ export default {
           this.$data.queryData.flag = 4;
         }
         setTimeout(() => {
-          document.documentElement.scrollTop = 0;
-          window.pageYOffset = 0;
-          document.body.scrollTop = 0;
           this.getExperienceData(this.$data.queryData.flag);
           this.$data.oldCategory = this.$data.categoryName;
           this.$data.loading = false;
+          document.documentElement.scrollTop = 0;
+          if (!this.$data.queryData.hasScroll) {
+            this.$data.queryData.hasScroll = true;
+            window.addEventListener("scroll", this.windowScroll);
+          }
         }, 2000);
       }
     },
@@ -232,16 +294,22 @@ export default {
       }
     },
     setData(data) {
+      if (data == null) {
+        this.$data.tableData = [];
+        return;
+      }
       let tmpData = data.records;
       let size = tmpData.length;
 
       if (this.$data.queryData.isScroll) {
         for (let i = 0; i < size; i++) {
+          tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
           tmpData[i].modifyTime = tmpData[i].modifyTime.slice(0, 10);
           this.$data.tableData.push(tmpData[i]);
         }
         if (size < 2) {
           this.$notify.error("没有更多数据");
+          this.$data.queryData.hasScroll = false;
           window.removeEventListener("scroll", this.windowScroll);
         } else {
           this.$data.queryData.currentPage++;
@@ -251,27 +319,90 @@ export default {
         let length = this.$data.tableData.length;
 
         for (let i = 0; i < length; i++) {
+          this.$data.tableData[i].createTime = this.$data.tableData[
+            i
+          ].createTime.slice(0, 10);
           this.$data.tableData[i].modifyTime = this.$data.tableData[
             i
           ].modifyTime.slice(0, 10);
         }
 
         if (size < this.$data.queryData.pageSize) {
+          this.$data.queryData.hasScroll = false;
           window.removeEventListener("scroll", this.windowScroll);
         }
         this.$data.queryData.currentPage = size / 2 + 1;
         this.$data.queryData.pageSize = 2;
       }
     },
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex % 2 == 0) {
+        return "warning-row";
+      }
+      return "";
+    },
     show(row) {
       this.$router.push({ path: "/exdetail", query: { content: row } });
     },
+    cancelCollect(row) {
+      this.$confirm("确定要取消收藏吗? ").then(_ => {
+        this.$data.loading = true;
+        let params = {};
+        params.id = row.id;
+
+        setTimeout(() => {
+          this.$axios
+            .post("/collect/cancelCollectEx", params)
+            .then(response => {
+              if (response && response.success) {
+                this.$alert(response.message, "取消结果", {
+                  confirmButtonText: "确定",
+                  callback: action => {
+                    this.$data.loading = false;
+                    location.replace(location);
+                  }
+                });
+              }
+            });
+        }, 2000);
+      });
+    },
+    editExperience(row) {
+      this.$data.ruleForm.essayId = row.id;
+      this.$data.ruleForm.title = row.title;
+      this.$data.ruleForm.content = row.content;
+      this.$data.dialog = true;
+    },
+    deleteExperience(row) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        center: true
+      }).then(() => {
+        this.loading = true;
+        let params = {};
+        params.id = row.id;
+        setTimeout(() => {
+          this.$axios
+            .post("/sysExperience/deleteExperience", params)
+            .then(response => {
+              if (response && response.success) {
+                this.$alert(response.message, "删除结果", {
+                  confirmButtonText: "确定",
+                  callback: action => {
+                    this.$data.loading = false;
+                    location.replace(location);
+                  }
+                });
+              }
+            });
+        }, 2000);
+      });
+    },
     windowScroll() {
       //滚动条滚动时距离顶部的距离
-      let scrollTop =
-        window.pageYOffset ||
-        document.documentElement.scrollTop ||
-        document.body.scrollTop;
+      let scrollTop = document.documentElement.scrollTop;
       //可视区的高度
       let windowHeight =
         document.documentElement.clientHeight || document.body.clientHeight;
@@ -279,12 +410,10 @@ export default {
       let scrollHeight =
         document.documentElement.scrollHeight || document.body.scrollHeight;
 
-      if (scrollTop + windowHeight == scrollHeight) {
-        if (this.$data.loading) return;
+      if (scrollTop + windowHeight == scrollHeight && !this.$data.loading) {
         this.$data.loading = true;
         setTimeout(() => {
-          document.documentElement.scrollTop = scrollTop;
-          console.log(document.documentElement.scrollTop);
+          document.documentElement.scrollTop = scrollTop - 10;
           this.$data.queryData.isScroll = true;
           this.getExperienceData(this.$data.queryData.flag);
           this.$data.loading = false;
@@ -306,5 +435,9 @@ export default {
   }
 };
 </script>
-<style scoped>
+
+<style>
+.el-table .warning-row {
+  background: #f0f9eb;
+}
 </style>

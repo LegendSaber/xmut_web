@@ -1,16 +1,12 @@
 <template>
   <div>
-    <el-container style="height: 100%; border: 1px solid #eee">
-      <el-header id="detailheader">
-        <experience-header />
-      </el-header>
-      <el-divider />
-      <el-main>
-        <div id="experiencemain">
-          <experience-main />
-        </div>
-      </el-main>
-    </el-container>
+    <o-carousel/>
+    <el-divider />
+    <el-tag style="margin-left: 240px;fontSize: 28px" type="success" plain>Pain is inevitable. Suffering is optional.</el-tag>
+    <el-divider />
+    <experience-header/>
+    <el-divider />
+    <experience-main/>
   </div>
 </template>
 <script>
@@ -28,9 +24,4 @@ export default {
 };
 </script>
 <style scoped>
-#detailheader{
-  line-height: 60px;
-  text-align: right;
-  font-size: 20px;
-}
 </style>

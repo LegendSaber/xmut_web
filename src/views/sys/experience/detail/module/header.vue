@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <el-row :gutter="2">
-            <el-page-header @back="goBack" content="详情页面"></el-page-header>
-        </el-row>
-    </div>
+  <div>
+      <el-button icon="el-icon-arrow-left" @click="goBack" type="primary" >返回</el-button>
+       <el-divider direction="vertical"></el-divider>
+       <span style="fontSize:20px">详细页面</span>
+  </div>
 </template>
 
 <script>

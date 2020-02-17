@@ -57,9 +57,13 @@ export default new Router({
         },
         {
             path: '/exdetail',
-            name: 'ExperienceDetail',
-            component: () =>
-                import ('../views/sys/experience/detail/index')
+            component: layout,
+            children: [{
+                path: '/',
+                name: 'ExperienceDetail',
+                component: () =>
+                    import ('../views/sys/experience/detail/index')
+            }]
         },
     ]
 })
