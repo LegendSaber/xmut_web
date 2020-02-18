@@ -138,9 +138,9 @@ export default {
         title: [
           { required: true, message: "请输入标题", trigger: "blur" },
           {
-            min: 10,
+            min: 3,
             max: 40,
-            message: "长度在 10 到 40 个字符",
+            message: "长度在 3 到 40 个字符",
             trigger: "blur"
           }
         ],
@@ -157,6 +157,12 @@ export default {
     };
   },
   methods: {
+    getFormatCode(strValue) {
+      return strValue.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/\s/g, ' ')
+    },
+    decryptCode(strValue) {
+      return strValue.replace(/<br\s*\/?>/ig,'\r\n').replace(/<br\s*\/?>/ig,'\n').replace(/\ \;/g,' ');
+    },
     addExperience() {
       this.$data.ruleForm.essayId = -1;
       this.$data.dialog = true;
@@ -167,7 +173,8 @@ export default {
           let params = {};
           this.$data.dwloading = true;
           params.title = this.$data.ruleForm.title;
-          params.content = this.$data.ruleForm.content;
+          if (this.$data.ruleForm.content != null) params.content = this.getFormatCode(this.$data.ruleForm.content);
+          else params.content = this.$data.ruleForm.content;
           if (this.$data.ruleForm.essayId == -1) {
             setTimeout(() => {
               this.$axios
@@ -370,7 +377,7 @@ export default {
     editExperience(row) {
       this.$data.ruleForm.essayId = row.id;
       this.$data.ruleForm.title = row.title;
-      this.$data.ruleForm.content = row.content;
+      this.$data.ruleForm.content = this.decryptCode(row.content);
       this.$data.dialog = true;
     },
     deleteExperience(row) {
