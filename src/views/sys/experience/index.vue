@@ -158,10 +158,16 @@ export default {
   },
   methods: {
     getFormatCode(strValue) {
-      return strValue.replace(/\r\n/g, "<br/>").replace(/\n/g, "<br/>").replace(/\s/g, ' ')
+      return strValue
+        .replace(/\r\n/g, "<br/>")
+        .replace(/\n/g, "<br/>")
+        .replace(/\s/g, " ");
     },
     decryptCode(strValue) {
-      return strValue.replace(/<br\s*\/?>/ig,'\r\n').replace(/<br\s*\/?>/ig,'\n').replace(/\ \;/g,' ');
+      return strValue
+        .replace(/<br\s*\/?>/gi, "\r\n")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/\ \;/g, " ");
     },
     addExperience() {
       this.$data.ruleForm.essayId = -1;
@@ -173,7 +179,8 @@ export default {
           let params = {};
           this.$data.dwloading = true;
           params.title = this.$data.ruleForm.title;
-          if (this.$data.ruleForm.content != null) params.content = this.getFormatCode(this.$data.ruleForm.content);
+          if (this.$data.ruleForm.content != null)
+            params.content = this.getFormatCode(this.$data.ruleForm.content);
           else params.content = this.$data.ruleForm.content;
           if (this.$data.ruleForm.essayId == -1) {
             setTimeout(() => {
@@ -187,7 +194,10 @@ export default {
                         this.$data.dwloading = false;
                         this.$data.dialog = false;
                         this.resetForm("ruleForm");
-                        location.replace(location);
+                        this.$data.queryData.isScroll = false;
+                        this.$data.queryData.currentPage = 0;
+                        this.$data.queryData.pageSize = 12;
+                        this.getExperienceData(this.$data.queryData.flag);
                       }
                     });
                   } else {
@@ -209,7 +219,10 @@ export default {
                         this.$data.dwloading = false;
                         this.$data.dialog = false;
                         this.resetForm("ruleForm");
-                        location.replace(location);
+                        this.$data.queryData.isScroll = false;
+                        this.$data.queryData.currentPage = 0;
+                        this.$data.queryData.pageSize = 12;
+                        this.getExperienceData(this.$data.queryData.flag);
                       }
                     });
                   }
@@ -366,7 +379,10 @@ export default {
                   confirmButtonText: "确定",
                   callback: action => {
                     this.$data.loading = false;
-                    location.replace(location);
+                    this.$data.queryData.isScroll = false;
+                    this.$data.queryData.currentPage = 0;
+                    this.$data.queryData.pageSize = 12;
+                    this.getExperienceData(this.$data.queryData.flag);
                   }
                 });
               }
@@ -399,7 +415,10 @@ export default {
                   confirmButtonText: "确定",
                   callback: action => {
                     this.$data.loading = false;
-                    location.replace(location);
+                    this.$data.queryData.isScroll = false;
+                    this.$data.queryData.currentPage = 0;
+                    this.$data.queryData.pageSize = 12;
+                    this.getExperienceData(this.$data.queryData.flag);
                   }
                 });
               }
