@@ -65,5 +65,15 @@ export default new Router({
                     import ('../views/sys/experience/detail/index')
             }]
         },
+        {
+            path: '/file',
+            component: layout,
+            children: [{
+                path: '/',
+                name: 'File',
+                component: () =>
+                    import ('../views/sys/file/index')
+            }]
+        }
     ]
 })

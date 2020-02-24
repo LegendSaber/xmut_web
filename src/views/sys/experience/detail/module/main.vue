@@ -111,9 +111,9 @@ export default {
         content: [
           { required: true, message: "请填写内容", trigger: "blur" },
           {
-            min: 10,
+            min: 5,
             max: 100,
-            message: "长度在 10 到 100 个字符",
+            message: "长度在 5 到 100 个字符",
             trigger: "blur"
           }
         ]
@@ -163,7 +163,6 @@ export default {
           } else {
             let params = {}
             params.id = this.$data.queryComment.selectId
-            params.author = this.$data.queryComment.selectAuthor
             params.content = this.getFormatCode(this.$data.ruleForm.content);
             this.$data.dwloading = true;
             setTimeout(() => {
@@ -233,7 +232,9 @@ export default {
               this.$data.commentData[i].createTime = this.$data.commentData[
                 i
               ].createTime.slice(0, 10);
-              this.$data.commentData[i].sonComment.sort(this.sortFun)
+              this.$data.commentData[i].sonComment.sort(function sortFun(x, y){
+                return  Date.parse(y.createTime) - Date.parse(x.createTime)  
+              })   
               let sonLen = this.$data.commentData[i].sonComment.length;
               for (let j = 0; j < sonLen; j++) {
                 this.$data.commentData[i].sonComment[j].createTime = this.$data.commentData[i].sonComment[j].createTime.slice(0, 10)
@@ -263,9 +264,6 @@ export default {
           }
         }
       });
-    },
-    sortFun(x, y){
-      return x.createTime - y.createTime
     },
     commentHandleClick() {
       if (this.$data.cardForm.category != this.$data.cardForm.oldCategory) {
