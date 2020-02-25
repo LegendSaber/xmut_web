@@ -53,30 +53,49 @@
       <el-tab-pane label="最新" name="new"></el-tab-pane>
       <el-tab-pane label="热门" name="hot"></el-tab-pane>
     </el-tabs>
-    <div style="margin-left: 50px;" v-for="(comment, index) in commentData" :key="index">
-      <div style="fontSize: 20px;" v-html="comment.content"></div>
-      <br />
-      <div style="fontSize:10px;">
-        <el-link type="primary">{{comment.author}}</el-link>
-        <el-divider direction="vertical"></el-divider>
-        <span>发表于: {{comment.createTime}}</span>
-        <el-divider direction="vertical"></el-divider>
-        <span>推荐人数: {{comment.favorNum}}</span>
-        <el-divider direction="vertical"></el-divider>
-        <el-link @click="recommend(comment.id)" type="warning">推荐</el-link>
-        <el-divider direction="vertical"></el-divider>
-        <el-link @click="replace(comment)" type="danger">回复</el-link>
-        <el-divider />
-        <div v-for="(son, index) in comment.sonComment" :key="index">
-          <div style="margin-left:80px;fontSize: 15px;" v-html="son.content"></div>
-          <br/>
-          <div style="fontSize: 10px;margin-left:80px;">
-            <el-link type="success">{{son.author}}</el-link>
+    <div v-for="(comment, index) in commentData" :key="index">
+      <el-row>
+        <el-col :span="1" :offset="1">
+          <el-avatar shape="square" :size="50" :src="squareUrl"></el-avatar>
+        </el-col>
+        <el-col :span="19" :offset="1">
+          <div style="fontSize: 20px;" v-html="comment.content"></div>
+          <br />
+          <div style="fontSize:10px;">
+            <el-link type="primary">{{comment.author}}</el-link>
             <el-divider direction="vertical"></el-divider>
-            <span>回复于: {{son.createTime}}</span>
-          </div> 
-          <el-divider/>
-        </div>
+            <span>发表于: {{comment.createTime}}</span>
+            <el-divider direction="vertical"></el-divider>
+            <span>推荐人数: {{comment.favorNum}}</span>
+            <el-divider direction="vertical"></el-divider>
+            <el-link @click="recommend(comment.id)" type="warning">推荐</el-link>
+            <el-divider direction="vertical"></el-divider>
+            <el-link @click="replace(comment)" type="danger">回复</el-link>
+          </div>
+        </el-col>
+        <el-col>
+          <el-divider />
+        </el-col>
+      </el-row>
+      <div v-for="(son, index) in comment.sonComment" :key="index">
+        <el-row>
+          <el-col :span="1" :offset="2">
+            <el-avatar :size="50" :src="circleUrl"></el-avatar>
+          </el-col>
+          <el-col :span="20" :offset="1">
+            <div style="fontSize: 15px;" v-html="son.content"></div>
+            <br />
+            <div style="fontSize: 10px;">
+              <el-link type="success">{{son.author}}</el-link>
+              <el-divider direction="vertical"></el-divider>
+              <span>回复于: {{son.createTime}}</span>
+            </div>
+          </el-col>
+
+          <el-col>
+            <el-divider />
+          </el-col>
+        </el-row>
       </div>
     </div>
   </div>
@@ -86,6 +105,10 @@
 export default {
   data() {
     return {
+      circleUrl:
+        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+      squareUrl:
+        "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
       essay: {},
       commentData: [],
       isCollect: false,
@@ -100,7 +123,7 @@ export default {
         flag: 1,
         isScroll: false,
         selectId: -1,
-        selectAuthor: "",
+        selectAuthor: ""
       },
       dwloading: false,
       dialogFormVisible: false,
@@ -121,19 +144,19 @@ export default {
     };
   },
   methods: {
-    addComment(){
-      this.$data.queryComment.selectId = -1
+    addComment() {
+      this.$data.queryComment.selectId = -1;
       this.$data.dialogFormVisible = true;
     },
     replace(comment) {
-      this.$data.queryComment.selectId = comment.id
+      this.$data.queryComment.selectId = comment.id;
       this.$data.queryComment.selectAuthor = comment.author;
       this.$data.dialogFormVisible = true;
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.$data.queryComment.selectId == -1){
+          if (this.$data.queryComment.selectId == -1) {
             let params = {};
             params.id = this.$data.essay.id;
             params.content = this.getFormatCode(this.$data.ruleForm.content);
@@ -161,32 +184,34 @@ export default {
               });
             }, 2000);
           } else {
-            let params = {}
-            params.id = this.$data.queryComment.selectId
+            let params = {};
+            params.id = this.$data.queryComment.selectId;
             params.content = this.getFormatCode(this.$data.ruleForm.content);
             this.$data.dwloading = true;
             setTimeout(() => {
-              this.$axios.post("/sysComment/insertSon", params).then(response => {
-                if (response && response.success) {
-                  this.$alert(response.message, "提交结果", {
-                    confirmButtonText: "确定",
-                    callback: action => {
-                      this.resetForm("ruleForm");
-                      this.$data.dwloading = false;
-                      this.$data.dialogFormVisible = false;
-                      this.$data.queryComment.currentPage = 0;
-                      this.$data.queryComment.pageSize = 12;
-                      this.$data.queryComment.isScroll = false;
-                      this.getComment();
-                      this.$data.queryComment.currentPage =
-                        this.$data.queryComment.pageSize / 2 + 1;
-                      this.$data.queryComment.pageSize = 2;
-                      window.addEventListener("scroll", this.windowScroll);
-                    }
-                  });
-                }
-              })
-            }, 2000)
+              this.$axios
+                .post("/sysComment/insertSon", params)
+                .then(response => {
+                  if (response && response.success) {
+                    this.$alert(response.message, "提交结果", {
+                      confirmButtonText: "确定",
+                      callback: action => {
+                        this.resetForm("ruleForm");
+                        this.$data.dwloading = false;
+                        this.$data.dialogFormVisible = false;
+                        this.$data.queryComment.currentPage = 0;
+                        this.$data.queryComment.pageSize = 12;
+                        this.$data.queryComment.isScroll = false;
+                        this.getComment();
+                        this.$data.queryComment.currentPage =
+                          this.$data.queryComment.pageSize / 2 + 1;
+                        this.$data.queryComment.pageSize = 2;
+                        window.addEventListener("scroll", this.windowScroll);
+                      }
+                    });
+                  }
+                });
+            }, 2000);
           }
         } else {
           this.$alert("表单信息填写有误，请修改!", "提交结果", {
@@ -220,10 +245,10 @@ export default {
       params.flag = this.$data.queryComment.flag;
 
       this.$axios.post("/sysComment/getAll", params).then(response => {
-        if (response && response.success) {    
-          if (response.data == null){
-              window.removeEventListener("scroll", this.windowScroll);
-              return;
+        if (response && response.success) {
+          if (response.data == null) {
+            window.removeEventListener("scroll", this.windowScroll);
+            return;
           }
           if (!this.$data.queryComment.isScroll) {
             this.$data.commentData = response.data.records;
@@ -232,15 +257,19 @@ export default {
               this.$data.commentData[i].createTime = this.$data.commentData[
                 i
               ].createTime.slice(0, 10);
-              this.$data.commentData[i].sonComment.sort(function sortFun(x, y){
-                return  Date.parse(y.createTime) - Date.parse(x.createTime)  
-              })   
+              this.$data.commentData[i].sonComment.sort(function sortFun(x, y) {
+                return Date.parse(y.createTime) - Date.parse(x.createTime);
+              });
               let sonLen = this.$data.commentData[i].sonComment.length;
               for (let j = 0; j < sonLen; j++) {
-                this.$data.commentData[i].sonComment[j].createTime = this.$data.commentData[i].sonComment[j].createTime.slice(0, 10)
+                this.$data.commentData[i].sonComment[
+                  j
+                ].createTime = this.$data.commentData[i].sonComment[
+                  j
+                ].createTime.slice(0, 10);
               }
             }
-            
+
             if (len < this.$data.queryComment.pageSize) {
               window.removeEventListener("scroll", this.windowScroll);
             }
@@ -400,8 +429,8 @@ export default {
     });
     this.getComment();
     this.$data.queryComment.currentPage =
-          this.$data.queryComment.pageSize / 2 + 1;
-        this.$data.queryComment.pageSize = 2;
+      this.$data.queryComment.pageSize / 2 + 1;
+    this.$data.queryComment.pageSize = 2;
   },
   mounted() {
     window.addEventListener("scroll", this.windowScroll);

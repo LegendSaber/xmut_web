@@ -6,18 +6,14 @@
     <el-divider />
     <el-upload
       class="upload-demo"
-      :with-credentials = "true"
+      :with-credentials="true"
       action="http://localhost:8888/xmut/sysFile/upload"
       :show-file-list="false"
       :before-upload="beforeAvatarUpload"
       :on-success="handleAvatarSuccess"
       :on-error="handleAvatarError"
     >
-      <el-button 
-      :disabled="loading"
-      icon="el-icon-upload" 
-      size="small" 
-      type="primary">点击上传</el-button>
+      <el-button :disabled="loading" icon="el-icon-upload" size="small" type="primary">点击上传</el-button>
       <div slot="tip" class="el-upload__tip">只能上传zip文件，且不超过50M</div>
     </el-upload>
     <el-divider />
@@ -40,11 +36,11 @@
       <el-table-column min-width="280" prop="fileName" label="文件名"></el-table-column>
       <el-table-column min-width="280" label="操作">
         <template slot-scope="scope">
-          <el-button @click="download(scope.row)" icon="el-icon-download" type="primary" plain>下载</el-button>
+          <el-button @click="download(scope.row.id)" icon="el-icon-download" type="primary" plain>下载</el-button>
           <el-button
             v-if="queryData.flag == 1"
             icon="el-icon-folder-add"
-            @click="cancelCollect(scope.row)"
+            @click="collect(scope.row.id)"
             type="warning"
             plain
           >收藏</el-button>
@@ -57,7 +53,7 @@
           <el-button
             v-if="queryData.flag == 3"
             icon="el-icon-star-on"
-            @click="cancelCollect(scope.row)"
+            @click="cancelCollect(scope.row.id)"
             type="warning"
             plain
           >已收藏</el-button>
@@ -65,7 +61,7 @@
             v-if="queryData.flag == 4"
             icon="el-icon-delete"
             type="danger"
-            @click="deleteFile(scope.row)"
+            @click="deleteFile(scope.row.id)"
             plain
           >删除</el-button>
         </template>
@@ -82,7 +78,7 @@ export default {
       oldCategory: "new",
       tableData: [],
       loading: true,
-      queryData:{
+      queryData: {
         currentPage: 0,
         pageSize: 12,
         flag: 1,
@@ -92,20 +88,20 @@ export default {
   },
   methods: {
     handleAvatarSuccess(response, file) {
-      this.$data.loading = false
+      this.$data.loading = false;
       if (response.success) {
         this.$notify.success("上传成功");
-        this.getInitData()
+        this.getInitData();
       } else {
         this.$notify.error(response.message);
       }
     },
     handleAvatarError() {
-      this.$data.loading = false
+      this.$data.loading = false;
       this.$notify.error("文件上传失败");
     },
     beforeAvatarUpload(file) {
-      this.$data.loading = true
+      this.$data.loading = true;
       //校验文件格式
       if (file.type.indexOf("zip") == -1) {
         this.$message.error("只能上传zip文件");
@@ -120,78 +116,86 @@ export default {
 
       return true;
     },
-    getInitData(){
-      this.$data.queryData.currentPage = 0
-        this.$data.queryData.pageSize = 12
-        this.$data.loading = true
-        this.$data.queryData.isScroll = false
-        setTimeout(() => {
-          this.getFileData()
-          window.addEventListener("scroll", this.windowScroll);
-          this.$data.queryData.currentPage =
-              this.$data.queryData.pageSize / 2 + 1;
-          this.$data.queryData.pageSize = 2;
-          document.documentElement.scrollTop = 0
-          this.$data.loading = false
-          this.$data.oldCategory = this.$data.categoryName      
-        }, 2000)
+    getInitData() {
+      this.$data.queryData.currentPage = 0;
+      this.$data.queryData.pageSize = 12;
+      this.$data.loading = true;
+      this.$data.queryData.isScroll = false;
+      setTimeout(() => {
+        this.getFileData();
+        window.addEventListener("scroll", this.windowScroll);
+        this.$data.queryData.currentPage =
+          this.$data.queryData.pageSize / 2 + 1;
+        this.$data.queryData.pageSize = 2;
+        document.documentElement.scrollTop = 0;
+        this.$data.loading = false;
+      }, 2000);
     },
     categoryHandle() {
       if (this.$data.oldCategory != this.$data.categoryName) {
         if (this.$data.categoryName === "new") {
-          this.$data.queryData.flag = 1
+          this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
-          this.$data.queryData.flag = 2
+          this.$data.queryData.flag = 2;
         } else if (this.$data.categoryName === "collect") {
-          this.$data.queryData.flag = 3
+          this.$data.queryData.flag = 3;
         } else {
-          this.$data.queryData.flag = 4
+          this.$data.queryData.flag = 4;
         }
-        this.getInitData()
+        this.getInitData();
+        this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    getFileData(){
-      let params = {}
-      params.currentPage = this.$data.queryData.currentPage
-      params.pageSize = this.$data.queryData.pageSize
-      if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2){
-        params.flag = this.$data.queryData.flag
+    getFileData() {
+      let params = {};
+      params.currentPage = this.$data.queryData.currentPage;
+      params.pageSize = this.$data.queryData.pageSize;
+      if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
+        params.flag = this.$data.queryData.flag;
         this.$axios.post("/sysFile/getAll", params).then(response => {
           if (response && response.success) {
-            this.setData(response.data)
+            this.setData(response.data);
           }
-        })
-      } else if (this.$data.queryData.flag == 3){
-
+        });
+      } else if (this.$data.queryData.flag == 3) {
+        this.$axios.post("/sysFile/getMyCollect", params).then(response => {
+          this.setData(response.data);
+        });
       } else {
-
+        this.$axios.post("/sysFile/getMyFile", params).then(response => {
+          if (response && response.success) {
+            this.setData(response.data);
+          }
+        });
       }
     },
     setData(data) {
       if (data == null) {
-        this.$data.tableData = []
+        this.$data.tableData = [];
         return;
       }
-      let tmpData = data.records
-      let length = tmpData.length
+      let tmpData = data.records;
+      let length = tmpData.length;
       if (!this.$data.queryData.isScroll) {
-        this.$data.tableData = tmpData
+        this.$data.tableData = tmpData;
 
         for (let i = 0; i < length; i++) {
-          this.$data.tableData[i].createTime = this.$data.tableData[i].createTime.slice(0, 10)
+          this.$data.tableData[i].createTime = this.$data.tableData[
+            i
+          ].createTime.slice(0, 10);
         }
-      }else {
-        for (let i = 0; i < length; i++){
-          tmpData[i].createTime = tmpData[i].createTime.slice(0, 10)
-          this.$data.tableData.push(tmpData[i])
+      } else {
+        for (let i = 0; i < length; i++) {
+          tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
+          this.$data.tableData.push(tmpData[i]);
         }
         if (length == 2) {
-          this.$data.queryData.currentPage++
+          this.$data.queryData.currentPage++;
         }
       }
       if (length < this.$data.queryData.pageSize) {
-          this.$notify.error("没有更多数据")
-          window.removeEventListener("scroll", this.windowScroll);
+        this.$notify.error("没有更多数据");
+        window.removeEventListener("scroll", this.windowScroll);
       }
     },
     tableRowClassName({ row, rowIndex }) {
@@ -200,21 +204,57 @@ export default {
       }
       return "";
     },
-    download(row) {
-      
+    download(id) {
+      let params = {}
+      params.id = id 
+      this.$axios.post("/sysFile/download", params).then(response => {
+        
+      })
     },
-    cancelCollect(row) {
-      this.$confirm("确定要取消收藏吗? ").then(_ => {
+    collect(id) {
+      let params = {};
+      params.id = id;
+      this.$axios.post("/sysFile/collect", params).then(response => {
+        if (response && response.success) {
+          this.$notify.success(response.message);
+          this.getInitData();
+        } else {
+          this.$notify.error(response.message);
+        }
       });
     },
-    deleteFile(row) {
+    cancelCollect(id) {
+      this.$confirm("确定要取消收藏吗? ").then(_ => {
+        let params = {};
+        params.id = id;
+        this.$axios.post("/sysFile/cancelCollect", params).then(response => {
+          if (response && response.success) {
+            this.$notify.success(response.message);
+            this.getInitData();
+          }
+        });
+      });
+    },
+    deleteFile(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
         center: true
       }).then(() => {
-        
+        let params = {};
+
+        params.id = id;
+        this.$axios.post("sysFile/delete", params).then(response => {
+          if (response && response.success) {
+            this.$alert(response.message, "删除结果", {
+              confirmButtonText: "确定",
+              callback: action => {
+                this.getInitData();
+              }
+            });
+          }
+        });
       });
     },
     windowScroll() {
@@ -242,7 +282,7 @@ export default {
     window.addEventListener("scroll", this.windowScroll);
   },
   created() {
-    this.getInitData()
+    this.getInitData();
   },
   beforeDestroy() {
     window.removeEventListener("scroll", this.windowScroll);
