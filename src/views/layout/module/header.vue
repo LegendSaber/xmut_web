@@ -205,6 +205,8 @@ export default {
         this.$router.push("/experience");
       } else if (this.activeName === "five" && this.$route.path != "/file") {
         this.$router.push("/file")
+      } else if (this.activeName === "fourth" && this.$route.path != "/knowledge"){
+        this.$router.push("/knowledge")
       }
     }
   },

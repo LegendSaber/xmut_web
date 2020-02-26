@@ -2,21 +2,15 @@
   <div>
     <o-carousel />
     <el-divider />
-    <el-tag style="margin-left:240px;fontSize: 28px" type="warning" plain>迷失的人就迷失了，相遇的人会再相遇。</el-tag>
+    <el-tag style="margin-left:200px;fontSize: 28px" type="success" plain>时代不同，空气不同，人的想法也随之不同。</el-tag>
     <el-divider />
-    <el-upload
-      class="upload-demo"
-      :with-credentials="true"
-      action="http://localhost:8888/xmut/sysFile/upload"
-      :show-file-list="false"
-      :before-upload="beforeAvatarUpload"
-      :on-success="handleAvatarSuccess"
-      :on-error="handleAvatarError"
-    >
-      <el-button :disabled="loading" icon="el-icon-upload" size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传zip文件，且不超过50M</div>
-    </el-upload>
-    <el-divider />
+    <el-button
+      @click="addKnowledge"
+      type="primary"
+      style="margin-bottom: 5px"
+      icon="el-icon-circle-plus"
+      :loading="loading"
+    >分享知识</el-button>
     <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
       <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
       <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
@@ -33,17 +27,16 @@
     >
       <el-table-column min-width="130" prop="createTime" label="日期"></el-table-column>
       <el-table-column min-width="130" prop="author" label="作者"></el-table-column>
-      <el-table-column min-width="280" prop="fileName" label="文件名"></el-table-column>
+      <el-table-column min-width="280" prop="title" label="标题"></el-table-column>
       <el-table-column min-width="280" label="操作">
         <template slot-scope="scope">
-          <el-button @click="download(scope.row.id)" icon="el-icon-download" type="primary" plain>下载</el-button>
+          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
           <el-button
             v-if="queryData.flag == 1"
-            icon="el-icon-folder-add"
-            @click="collect(scope.row.id)"
-            type="warning"
+            icon="el-icon-bell"
+            type="success"
             plain
-          >收藏</el-button>
+          >更新日期:{{scope.row.modifyTime}}</el-button>
           <el-button
             v-if="queryData.flag == 2"
             icon="el-icon-user"
@@ -59,9 +52,16 @@
           >已收藏</el-button>
           <el-button
             v-if="queryData.flag == 4"
+            icon="el-icon-edit"
+            type="warning"
+            @click="editKnowledge(scope.row.id)"
+            plain
+          >编辑</el-button>
+          <el-button
+            v-if="queryData.flag == 4"
             icon="el-icon-delete"
             type="danger"
-            @click="deleteFile(scope.row.id)"
+            @click="deleteKnowledge(scope.row.id)"
             plain
           >删除</el-button>
         </template>
@@ -87,52 +87,6 @@ export default {
     };
   },
   methods: {
-    handleAvatarSuccess(response, file) {
-      this.$data.loading = false;
-      if (response.success) {
-        this.$notify.success("上传成功");
-        this.getInitData();
-      } else {
-        this.$notify.error(response.message);
-      }
-    },
-    handleAvatarError() {
-      this.$data.loading = false;
-      this.$notify.error("文件上传失败");
-    },
-    beforeAvatarUpload(file) {
-      this.$data.loading = true;
-      //校验文件格式
-      if (file.type.indexOf("zip") == -1) {
-        this.$message.error("只能上传zip文件");
-        this.$data.loading = false;
-        return false;
-      }
-
-      //校验文件大小
-      if (file.size / 1024 / 1024 > 50) {
-        this.$message.error("上传的文件不可以超过50M");
-        this.$data.loading = false;
-        return false;
-      }
-
-      return true;
-    },
-    getInitData() {
-      this.$data.queryData.currentPage = 0;
-      this.$data.queryData.pageSize = 12;
-      this.$data.loading = true;
-      this.$data.queryData.isScroll = false;
-      setTimeout(() => {
-        this.getFileData();
-        window.addEventListener("scroll", this.windowScroll);
-        this.$data.queryData.currentPage =
-          this.$data.queryData.pageSize / 2 + 1;
-        this.$data.queryData.pageSize = 2;
-        document.documentElement.scrollTop = 0;
-        this.$data.loading = false;
-      }, 2000);
-    },
     categoryHandle() {
       if (this.$data.oldCategory != this.$data.categoryName) {
         if (this.$data.categoryName === "new") {
@@ -148,23 +102,92 @@ export default {
         this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    getFileData() {
+    show(id) {
+
+    },
+    collect(id) {
+      let params = {};
+      params.id = id;
+
+      this.$axios.post("/sysKnowledge/collect", params).then(response => {
+        if (response && response.success) {
+          this.$notify.success(response.message);
+          this.getInitData();
+        } else {
+          this.$notify.error(response.message);
+        }
+      });
+    },
+    cancelCollect(id) {
+      this.$confirm("确定要取消收藏吗? ").then(_ => {
+        let params = {};
+        params.id = id;
+
+        this.$axios.post("/sysKnowledge/cancelCollect", params).then(response => {
+          if (response && response.success) {
+            this.$notify.success(response.message);
+            this.getInitData();
+          }
+        });
+      });
+    },
+    editKnowledge(id){
+
+    },
+    deleteKnowledge(id) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        center: true
+      }).then(() => {
+        let params = {};
+        params.id = id;
+
+        this.$axios.post("sysKnowledge/delete", params).then(response => {
+          if (response && response.success) {
+            this.$alert(response.message, "删除结果", {
+              confirmButtonText: "确定",
+              callback: action => {
+                this.getInitData();
+              }
+            });
+          }
+        });
+      });
+    },
+    getInitData() {
+      this.$data.queryData.currentPage = 0;
+      this.$data.queryData.pageSize = 12;
+      this.$data.loading = true;
+      this.$data.queryData.isScroll = false;
+      setTimeout(() => {
+        this.getKnowledgeData();
+        window.addEventListener("scroll", this.windowScroll);
+        this.$data.queryData.currentPage =
+          this.$data.queryData.pageSize / 2 + 1;
+        this.$data.queryData.pageSize = 2;
+        document.documentElement.scrollTop = 0;
+        this.$data.loading = false;
+      }, 2000);
+    },
+    getKnowledgeData() {
       let params = {};
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
       if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
         params.flag = this.$data.queryData.flag;
-        this.$axios.post("/sysFile/getAll", params).then(response => {
+        this.$axios.post("/sysKnowledge/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
       } else if (this.$data.queryData.flag == 3) {
-        this.$axios.post("/sysFile/getMyCollect", params).then(response => {
+        this.$axios.post("/sysKnowledge/getMyCollect", params).then(response => {
           this.setData(response.data);
         });
       } else {
-        this.$axios.post("/sysFile/getMyFile", params).then(response => {
+        this.$axios.post("/sysKnowledge/getMyKnowledge", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
@@ -206,55 +229,6 @@ export default {
       }
       return "";
     },
-    download(id) {
-      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id)
-    },
-    collect(id) {
-      let params = {};
-      params.id = id;
-      this.$axios.post("/sysFile/collect", params).then(response => {
-        if (response && response.success) {
-          this.$notify.success(response.message);
-          this.getInitData();
-        } else {
-          this.$notify.error(response.message);
-        }
-      });
-    },
-    cancelCollect(id) {
-      this.$confirm("确定要取消收藏吗? ").then(_ => {
-        let params = {};
-        params.id = id;
-        this.$axios.post("/sysFile/cancelCollect", params).then(response => {
-          if (response && response.success) {
-            this.$notify.success(response.message);
-            this.getInitData();
-          }
-        });
-      });
-    },
-    deleteFile(id) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        center: true
-      }).then(() => {
-        let params = {};
-
-        params.id = id;
-        this.$axios.post("sysFile/delete", params).then(response => {
-          if (response && response.success) {
-            this.$alert(response.message, "删除结果", {
-              confirmButtonText: "确定",
-              callback: action => {
-                this.getInitData();
-              }
-            });
-          }
-        });
-      });
-    },
     windowScroll() {
       //滚动条滚动时距离顶部的距离
       let scrollTop = document.documentElement.scrollTop;
@@ -270,7 +244,7 @@ export default {
         setTimeout(() => {
           document.documentElement.scrollTop = scrollTop - 10;
           this.$data.queryData.isScroll = true;
-          this.getFileData();
+          this.getKnowledgeData();
           this.$data.loading = false;
         }, 2000);
       }

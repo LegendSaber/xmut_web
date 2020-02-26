@@ -7,7 +7,7 @@ axiosIns.defaults.baseURL = 'http://localhost:8888/xmut'
 axiosIns.defaults.retry = 4
 axiosIns.defaults.retryDelay = 1000
 axiosIns.defaults.timeout = 10000
-axiosIns.defaults.withCredentials = true    //让ajax携带cookie
+axiosIns.defaults.withCredentials = true //让ajax携带cookie
 
 //添加请求拦截器
 axiosIns.interceptors.request.use(config => {
@@ -16,7 +16,7 @@ axiosIns.interceptors.request.use(config => {
         'Content-Type': 'application/x-www-form-urlencoded'
     })
     config.data = qs.stringify(config.data)
-    
+
     return config
 }, err => {
     //对错误请求进行处理
@@ -66,8 +66,8 @@ export default {
      * @param {*} url
      * @param {*} params
      */
-    get: function (url, params = {}) {
-        return new Promise(function (resolve, reject) {
+    get: function(url, params = {}) {
+        return new Promise(function(resolve, reject) {
             axiosIns.get(url, {
                 params: params
             }).then(response => {
@@ -79,12 +79,12 @@ export default {
     },
 
     /**
-   * Post方法
-   * @param {*} url
-   * @param {*} params
-   */
-    post: function (url, params = {}) {
-        return new Promise(function (resolve, reject) {
+     * Post方法
+     * @param {*} url
+     * @param {*} params
+     */
+    post: function(url, params = {}) {
+        return new Promise(function(resolve, reject) {
             axiosIns.post(url, params).then(response => {
                 resolve(response.data)
             }).catch(err => {
@@ -99,10 +99,10 @@ export default {
      * @param {*} params
      */
     put: function(url, params = {}) {
-        return new Promise(function (resolve, reject){
+        return new Promise(function(resolve, reject) {
             axiosIns.put(url, params).then(response => {
                 resolve(response.data)
-            }).catch (err => {
+            }).catch(err => {
                 reject(err)
             })
         })
@@ -113,8 +113,8 @@ export default {
      * @param {*} url
      * @param {*} params
      */
-    delete: function (url, params = {}) {
-        return new Promise(function(resolve, reject){
+    delete: function(url, params = {}) {
+        return new Promise(function(resolve, reject) {
             axiosIns.delete(url, params).then(response => {
                 resolve(response.data)
             }).catch(err => {
@@ -123,4 +123,3 @@ export default {
         })
     }
 }
-
