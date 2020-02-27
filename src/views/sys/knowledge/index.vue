@@ -11,12 +11,31 @@
       icon="el-icon-circle-plus"
       :loading="loading"
     >分享知识</el-button>
-    <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
-      <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
-      <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
-      <el-tab-pane :disabled="loading" label="收藏" name="collect"></el-tab-pane>
-      <el-tab-pane :disabled="loading" label="我的" name="my"></el-tab-pane>
-    </el-tabs>
+    <div>
+      <el-row>
+        <el-col :span="21">
+          <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
+            <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
+            <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
+            <el-tab-pane :disabled="loading" label="收藏" name="collect"></el-tab-pane>
+            <el-tab-pane :disabled="loading" label="我的" name="my"></el-tab-pane>
+          </el-tabs>
+        </el-col>
+        <el-col :span="1">
+          <el-dropdown @command="handleCommand" style="margin-top:6px;">
+            <el-button type="primary">
+              知识类别<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="a">数据结构与算法</el-dropdown-item>
+              <el-dropdown-item command="b">操作系统</el-dropdown-item>
+              <el-dropdown-item command="c">计算机组成原理</el-dropdown-item>
+              <el-dropdown-item command="d">计算机网络</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </el-col>
+      </el-row>
+    </div>
     <el-table
       :data="tableData"
       border
@@ -81,12 +100,31 @@ export default {
       queryData: {
         currentPage: 0,
         pageSize: 12,
+        category: '数据结构与算法',
         flag: 1,
         isScroll: false
       }
     };
   },
   methods: {
+    addKnowledge(){
+      this.$router.push('/addKnowledge')
+    },
+    handleCommand(command) {
+        if (command == 'a' && this.$data.queryData.category != '数据结构与算法'){
+          this.$data.queryData.category = '数据结构与算法'
+          this.getInitData()
+        } else if (command == 'b' && this.$data.queryData.category != '操作系统'){
+          this.$data.queryData.category = '操作系统'
+          this.getInitData()
+        } else if (command == 'c' && this.$data.queryData.category != '计算机组成原理'){
+          this.$data.queryData.category = '计算机组成原理'
+          this.getInitData()
+        } else if (command == 'd' && this.$data.queryData.category != '计算机网络'){
+          this.$data.queryData.category = '计算机网络'
+          this.getInitData()
+        }
+    },
     categoryHandle() {
       if (this.$data.oldCategory != this.$data.categoryName) {
         if (this.$data.categoryName === "new") {
@@ -161,20 +199,22 @@ export default {
       this.$data.queryData.pageSize = 12;
       this.$data.loading = true;
       this.$data.queryData.isScroll = false;
-      setTimeout(() => {
-        this.getKnowledgeData();
-        window.addEventListener("scroll", this.windowScroll);
-        this.$data.queryData.currentPage =
-          this.$data.queryData.pageSize / 2 + 1;
-        this.$data.queryData.pageSize = 2;
-        document.documentElement.scrollTop = 0;
-        this.$data.loading = false;
-      }, 2000);
+      // setTimeout(() => {
+      //   this.getKnowledgeData();
+      //   window.addEventListener("scroll", this.windowScroll);
+      //   this.$data.queryData.currentPage =
+      //     this.$data.queryData.pageSize / 2 + 1;
+      //   this.$data.queryData.pageSize = 2;
+      //   document.documentElement.scrollTop = 0;
+      //   this.$data.loading = false;
+      // }, 2000);
+      this.$data.loading = false;
     },
     getKnowledgeData() {
       let params = {};
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
+      params.category = this.$data.queryData.category
       if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
         params.flag = this.$data.queryData.flag;
         this.$axios.post("/sysKnowledge/getAll", params).then(response => {
@@ -265,5 +305,14 @@ export default {
 <style>
 .el-table .warning-row {
   background: #f0f9eb;
+}
+.el-dropdown {
+  vertical-align: top;
+}
+.el-dropdown + .el-dropdown {
+  margin-left: 15px;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
 }
 </style>

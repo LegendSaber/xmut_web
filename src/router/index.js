@@ -84,6 +84,26 @@ export default new Router({
                 component: () =>
                     import ('../views/sys/knowledge/index')
             }]
+        },
+        {
+            path: '/addKnowledge',
+            component: layout,
+            children: [{
+                path: '/',
+                name: "AddKnowledge",
+                component: () =>
+                    import ('../views/sys/knowledge/add/index')
+            }]
+        },
+        {
+            path: '/knDetail',
+            component: layout,
+            children: [{
+                path: '/',
+                name: "knDetail",
+                component: () =>
+                    import ('../views/sys/knowledge/detail/index')
+            }]
         }
     ]
 })
