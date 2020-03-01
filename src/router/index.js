@@ -96,7 +96,7 @@ export default new Router({
             }]
         },
         {
-            path: '/knDetail',
+            path: '/kndetail',
             component: layout,
             children: [{
                 path: '/',

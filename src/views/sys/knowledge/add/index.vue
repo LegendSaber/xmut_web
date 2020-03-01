@@ -16,12 +16,13 @@
       <el-form-item>
       <div>
         <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="http://localhost:8888/xmut/sysKnowledge/upload"
             list-type="picture-card"
+            ref="upload"
             :with-credentials="true"
+            :auto-upload="false"
             :before-upload="beforeAvatarUpload"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove">
+            :on-preview="handlePictureCardPreview">
             <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="ruleForm.dialogVisible">
@@ -31,12 +32,6 @@
       </el-form-item>
       <el-form-item>
         <div class="demo-drawer__footer">
-          <el-button
-            :loading="loading"
-            type="primary"
-            @click="submitForm('ruleForm')"
-          >{{ loading ? '提交中 ...' : '提交' }}</el-button>
-          <el-button type="warning" @click="resetForm('ruleForm')" plain>重置</el-button>
           <el-select v-model="ruleForm.value" placeholder="请选择类别">
             <el-option
               v-for="item in options"
@@ -45,6 +40,12 @@
               :value="item.value"
             ></el-option>
           </el-select>
+          <el-button
+            :loading="loading"
+            type="primary"
+            @click="submitForm('ruleForm')"
+          >{{ loading ? '提交中 ...' : '提交' }}</el-button>
+          <el-button type="warning" @click="resetForm('ruleForm')" plain>重置</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -120,11 +121,23 @@ export default {
         }
         if (valid) {
           let params = {};
+
           params.title = this.$data.ruleForm.title;
           if (this.$data.ruleForm.content != null)
             params.content = this.getFormatCode(this.$data.ruleForm.content);
           else params.content = this.$data.ruleForm.content;
-          
+          params.category = this.$data.ruleForm.value 
+          this.$axios.post("/sysKnowledge/insert", params).then(response => {
+            if (response && response.success) {
+              this.$refs.upload.submit()
+              this.$alert(response.message, "删除结果", {
+                confirmButtonText: "确定",
+                callback: action => {
+                  this.$router.push("/knowledge")
+                }
+              });
+            }
+          })
         } else {
           this.$alert("表单信息填写有误，请修改!", "提交结果", {
             confirmButtonText: "确定"
@@ -142,11 +155,12 @@ export default {
         const isLt2M = file.size / 1024 / 1024 < 2;
 
         if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
+          this.$message.error('上传图片只能是 JPG 格式!');
         }
         if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
+          this.$message.error('上传图片大小不能超过 2MB!');
         }
+        
         return isJPG && isLt2M;
     },
     handlePictureCardPreview(file) {

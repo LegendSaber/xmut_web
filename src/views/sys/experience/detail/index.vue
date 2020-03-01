@@ -333,7 +333,7 @@ export default {
               this.$alert(response.message, "删除结果", {
                 confirmButtonText: "确定",
                 callback: action => {
-                  this.goBack();
+                  this.$router.push("/experience");
                 }
               });
             }
@@ -357,9 +357,6 @@ export default {
           this.$data.isCollect = false;
         }
       });
-    },
-    goBack() {
-      this.$router.push("/experience");
     },
     recommend(id) {
       let params = {};
@@ -408,7 +405,7 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.content.id == null) this.goBack();
+    if (this.$route.query.content.id == null) this.$router.push("/experience");
     this.$data.essay = this.$route.query.content;
     let params = {};
     params.id = this.$data.essay.id;

@@ -44,12 +44,12 @@
       v-loading="loading"
       element-loading-text="拼命加载中"
     >
-      <el-table-column min-width="130" prop="createTime" label="日期"></el-table-column>
-      <el-table-column min-width="130" prop="author" label="作者"></el-table-column>
-      <el-table-column min-width="280" prop="title" label="标题"></el-table-column>
-      <el-table-column min-width="280" label="操作">
+      <el-table-column min-width="120" prop="createTime" label="日期"></el-table-column>
+      <el-table-column min-width="110" prop="author" label="作者"></el-table-column>
+      <el-table-column min-width="240" prop="title" label="标题"></el-table-column>
+      <el-table-column min-width="350" label="操作">
         <template slot-scope="scope">
-          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
+          <el-button @click="show(scope.row)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
           <el-button
             v-if="queryData.flag == 1"
             icon="el-icon-bell"
@@ -83,6 +83,10 @@
             @click="deleteKnowledge(scope.row.id)"
             plain
           >删除</el-button>
+          <el-button
+            type="info"
+            plain
+          >{{scope.row.category}}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -140,21 +144,8 @@ export default {
         this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    show(id) {
-
-    },
-    collect(id) {
-      let params = {};
-      params.id = id;
-
-      this.$axios.post("/sysKnowledge/collect", params).then(response => {
-        if (response && response.success) {
-          this.$notify.success(response.message);
-          this.getInitData();
-        } else {
-          this.$notify.error(response.message);
-        }
-      });
+    show(row) {
+      this.$router.push({ path: "/kndetail", query: { content: row } });
     },
     cancelCollect(id) {
       this.$confirm("确定要取消收藏吗? ").then(_ => {
@@ -199,16 +190,15 @@ export default {
       this.$data.queryData.pageSize = 12;
       this.$data.loading = true;
       this.$data.queryData.isScroll = false;
-      // setTimeout(() => {
-      //   this.getKnowledgeData();
-      //   window.addEventListener("scroll", this.windowScroll);
-      //   this.$data.queryData.currentPage =
-      //     this.$data.queryData.pageSize / 2 + 1;
-      //   this.$data.queryData.pageSize = 2;
-      //   document.documentElement.scrollTop = 0;
-      //   this.$data.loading = false;
-      // }, 2000);
-      this.$data.loading = false;
+      setTimeout(() => {
+        this.getKnowledgeData();
+        window.addEventListener("scroll", this.windowScroll);
+        this.$data.queryData.currentPage =
+          this.$data.queryData.pageSize / 2 + 1;
+        this.$data.queryData.pageSize = 2;
+        document.documentElement.scrollTop = 0;
+        this.$data.loading = false;
+      }, 2000);
     },
     getKnowledgeData() {
       let params = {};
@@ -223,8 +213,10 @@ export default {
           }
         });
       } else if (this.$data.queryData.flag == 3) {
-        this.$axios.post("/sysKnowledge/getMyCollect", params).then(response => {
-          this.setData(response.data);
+        this.$axios.post("/sysKnowledge/getFavorKnowledge", params).then(response => {
+          if (response && response.success) {
+            this.setData(response.data);
+          }
         });
       } else {
         this.$axios.post("/sysKnowledge/getMyKnowledge", params).then(response => {
@@ -248,10 +240,14 @@ export default {
           this.$data.tableData[i].createTime = this.$data.tableData[
             i
           ].createTime.slice(0, 10);
+          this.$data.tableData[i].modifyTime = this.$data.tableData[
+            i
+          ].modifyTime.slice(0, 10);
         }
       } else {
         for (let i = 0; i < length; i++) {
           tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
+          tmpData[i].modifyTime = tmpData[i].modifyTime.slice(0, 10);
           this.$data.tableData.push(tmpData[i]);
         }
         if (length == 2) {

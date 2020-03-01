@@ -161,7 +161,9 @@ export default {
         });
       } else if (this.$data.queryData.flag == 3) {
         this.$axios.post("/sysFile/getMyCollect", params).then(response => {
-          this.setData(response.data);
+          if (response && response.success) {
+            this.setData(response.data);
+          }
         });
       } else {
         this.$axios.post("/sysFile/getMyFile", params).then(response => {
@@ -225,6 +227,7 @@ export default {
       this.$confirm("确定要取消收藏吗? ").then(_ => {
         let params = {};
         params.id = id;
+
         this.$axios.post("/sysFile/cancelCollect", params).then(response => {
           if (response && response.success) {
             this.$notify.success(response.message);
