@@ -12,16 +12,21 @@
     </div>
     <el-divider />
     <div v-html="essay.content" style="fontSize:20px;"></div>
-    <el-divider />
-    <viewer :images="images">
-      <img
-        class="item-image"
-        v-for="(image, index) in this.images"
-        :alt="image.pictureName"
-        :key="'image'+index"
-        :src="image.url"
+    <div v-if="images.length > 0">
+      <el-divider />
+      <img 
+      v-for="(image, index) in images" 
+      :alt="image.name"
+      :key="index" 
+      :src="image.img"
+      width="304"
+      height="228"
+      @click="showImg(index)"
       />
-    </viewer>
+      <el-dialog :visible.sync="bigImg.dialogVisible">
+        <img width="100%" :src="bigImg.dialogImageUrl" alt="">
+      </el-dialog>
+    </div>
     <el-divider />
     <el-button v-if="!isCollect" @click="collect" type="primary" icon="el-icon-star-off" plain>点击收藏</el-button>
     <el-button v-else @click="cancelCollect" type="warning" icon="el-icon-star-on">已收藏</el-button>
@@ -123,6 +128,10 @@ export default {
       essay: {},
       commentData: [],
       images: [],
+      bigImg: {
+        dialogImageUrl: '',
+        dialogVisible: false
+      },
       isCollect: false,
       isMy: false,
       cardForm: {
@@ -156,6 +165,10 @@ export default {
     };
   },
   methods: {
+    showImg(index) {
+      this.$data.bigImg.dialogImageUrl = this.$data.images[index].img
+      this.$data.bigImg.dialogVisible = true
+    },
     addComment() {
       this.$data.queryComment.selectId = -1;
       this.$data.dialogFormVisible = true;
@@ -446,20 +459,20 @@ export default {
     this.$data.queryComment.currentPage =
       this.$data.queryComment.pageSize / 2 + 1;
     this.$data.queryComment.pageSize = 2;
-    
-    this.$data.images = [
-          {
-            name: "产品图",
-            url: "http//localhost:8888/xmut/sysFile/loadPicture?id=" + this.$data.essay.id
-          }
-        ];
-    // this.$axios.post("/sysFile/loadPicture", params).then(response => {
-    //   if (response && response.success) {
-    //     console.log("111")
-    //     console.log(response);
-    //     this.$data.images = response.data;
-    //   }
-    // });
+
+    this.$axios.post("/sysFile/loadPicture", params).then(response => {
+      if (response && response.success) {
+        let data = response.data;
+        let length = data.length;
+
+        for (let i = 0; i < length; i++) {
+          let params = {}
+          params.name = data[i].name
+          params.img = data[i].img
+          this.$data.images.push(params)
+        }
+      }
+    })
   },
   mounted() {
     window.addEventListener("scroll", this.windowScroll);

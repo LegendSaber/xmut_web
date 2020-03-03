@@ -73,7 +73,7 @@
             v-if="queryData.flag == 4"
             icon="el-icon-edit"
             type="warning"
-            @click="editKnowledge(scope.row.id)"
+            @click="editKnowledge(scope.row)"
             plain
           >编辑</el-button>
           <el-button
@@ -160,8 +160,8 @@ export default {
         });
       });
     },
-    editKnowledge(id){
-
+    editKnowledge(row){
+      this.$router.push({ path: "/addKnowledge", query: { content: row } });
     },
     deleteKnowledge(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {

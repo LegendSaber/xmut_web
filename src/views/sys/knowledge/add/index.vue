@@ -21,6 +21,8 @@
             ref="upload"
             :with-credentials="true"
             :auto-upload="false"
+            :file-list="fileList"
+            :on-remove="handleRemove"
             :before-upload="beforeAvatarUpload"
             :on-preview="handlePictureCardPreview">
             <i class="el-icon-plus"></i>
@@ -56,6 +58,8 @@
 export default {
   data() {
     return {
+      isEdit: false,
+      fileList:[],
       options: [
         {
           value: "数据结构与算法",
@@ -111,6 +115,12 @@ export default {
         .replace(/\n/g, "<br/>")
         .replace(/\s/g, " ");
     },
+    decryptCode(strValue) {
+      return strValue
+        .replace(/<br\s*\/?>/gi, "\r\n")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/\ \;/g, " ");
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (this.$data.ruleForm.value == ''){
@@ -122,22 +132,42 @@ export default {
         if (valid) {
           let params = {};
 
-          params.title = this.$data.ruleForm.title;
-          if (this.$data.ruleForm.content != null)
-            params.content = this.getFormatCode(this.$data.ruleForm.content);
-          else params.content = this.$data.ruleForm.content;
-          params.category = this.$data.ruleForm.value 
-          this.$axios.post("/sysKnowledge/insert", params).then(response => {
-            if (response && response.success) {
-              this.$refs.upload.submit()
-              this.$alert(response.message, "删除结果", {
-                confirmButtonText: "确定",
-                callback: action => {
-                  this.$router.push("/knowledge")
-                }
-              });
-            }
-          })
+          if (!this.$data.isEdit){
+            params.title = this.$data.ruleForm.title;
+            if (this.$data.ruleForm.content != null)
+              params.content = this.getFormatCode(this.$data.ruleForm.content);
+            else params.content = this.$data.ruleForm.content;
+            params.category = this.$data.ruleForm.value 
+            this.$axios.post("/sysKnowledge/insert", params).then(response => {
+              if (response && response.success) {
+                this.$refs.upload.submit()
+                this.$alert(response.message, "提交结果", {
+                  confirmButtonText: "确定",
+                  callback: action => {
+                    this.$router.push("/knowledge")
+                  }
+                });
+              }
+            }) 
+          } else{
+            params.id = this.$route.query.content.id
+            params.title = this.$data.ruleForm.title;
+            if (this.$data.ruleForm.content != null)
+              params.content = this.getFormatCode(this.$data.ruleForm.content);
+            else params.content = this.$data.ruleForm.content;
+            params.category = this.$data.ruleForm.value 
+            this.$axios.post("/sysKnowledge/updata", params).then(response => {
+              if (response && response.success) {
+                this.$refs.upload.submit()
+                this.$alert(response.message, "提交结果", {
+                  confirmButtonText: "确定",
+                  callback: action => {
+                    this.$router.push("/knowledge")
+                  }
+                });
+              }
+            })
+          }
         } else {
           this.$alert("表单信息填写有误，请修改!", "提交结果", {
             confirmButtonText: "确定"
@@ -160,12 +190,47 @@ export default {
         if (!isLt2M) {
           this.$message.error('上传图片大小不能超过 2MB!');
         }
-        
+      
         return isJPG && isLt2M;
     },
     handlePictureCardPreview(file) {
         this.$data.ruleForm.dialogImageUrl = file.url;
         this.$data.ruleForm.dialogVisible = true;
+    },
+    handleRemove(file, fileList) {
+      let params = {}
+
+      params.knowledge_id = this.$route.query.content.id
+      params.picture_id = Number(file.id)
+      this.$axios.post("/sysFile/deletePicture", params).then(response=>{
+  
+      })
+    }
+  },
+  created() {
+    if (this.$route.query.content.id != null) {
+      this.$data.isEdit = true
+      let data = this.$route.query.content;
+      this.$data.ruleForm.title = data.title
+      this.$data.ruleForm.content = this.decryptCode(data.content)
+      this.$data.ruleForm.value = data.category
+      let params = {}
+
+      params.id = this.$route.query.content.id
+      this.$axios.get("/sysFile/loadPicture", params).then(response => {
+        if (response && response.success) {
+          let data = response.data;
+          let length = data.length;
+
+          for (let i = 0; i < length; i++) {
+            let d = {}
+            d.name = data[i].name
+            d.url = data[i].img
+            d.id = data[i].id
+            this.$data.fileList.push(d)
+          }
+        }
+      })
     }
   }
 };
