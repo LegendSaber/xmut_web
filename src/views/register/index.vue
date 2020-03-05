@@ -50,20 +50,16 @@ export default {
         username: "",
         password: "",
         repPassword: "",
-        value: 1
+        value: "研友"
       },
       options: [
         {
-          value: 1,
+          value: "研友",
           label: "研友"
         },
         {
-          value: 2,
+          value: "路人",
           label: "路人"
-        },
-        {
-          value: 3,
-          label: "开课老师"
         }
       ],
     };
@@ -76,7 +72,7 @@ export default {
         let params = {}
         params.username = this.$data.registerForm.username
         params.password = this.$data.registerForm.password
-        params.flag = this.$data.registerForm.value
+        params.roleName = this.$data.registerForm.value
 
         this.$axios.post('/sysUser/register', params)
         .then(response => {
