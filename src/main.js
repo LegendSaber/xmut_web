@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 import http from './utils/http'
 import components from './components/components.js'
+import '@/assets/css/global.css'
 
 Vue.prototype.$axios = http
 
@@ -13,14 +14,14 @@ Vue.config.productionTip = false
 
 Vue.use(components)
 Vue.use(ElementUI, {
-  size: 'small',
-  zIndex: 3000
+    size: 'small',
+    zIndex: 3000
 })
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 })

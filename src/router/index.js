@@ -6,6 +6,9 @@ Vue.use(Router)
 const layout = () =>
     import ('../views/layout/index');
 
+const mangerLayout = () =>
+    import ("../views/sys/usermanager/layout/index")
+
 export default new Router({
     mode: "history",
     base: process.env.BASE_URL,
@@ -103,6 +106,31 @@ export default new Router({
                 name: "knDetail",
                 component: () =>
                     import ('../views/sys/knowledge/detail/index')
+            }]
+        },
+        {
+            path: '/usermanager',
+            name: 'Usermanager',
+            redirect: '/mydata'
+        },
+        {
+            path: '/myexperience',
+            name: "MyExperience",
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/experience/my/index")
+            }]
+        },
+        {
+            path: "/mydata",
+            name: "MyData",
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/my/index")
             }]
         }
     ]

@@ -5,7 +5,7 @@
         <el-col :span="7" :offset="4">
           <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="主页" name="first"></el-tab-pane>
-            <el-tab-pane label="打卡签到区" name="second"></el-tab-pane>
+            <el-tab-pane v-if="currentUser.roleName == '研友'" label="打卡签到区" name="second"></el-tab-pane>
             <el-tab-pane label="经验分享区" name="third"></el-tab-pane>
             <el-tab-pane label="知识分享区" name="fourth"></el-tab-pane>
             <el-tab-pane label="资料分享区" name="five"></el-tab-pane>
@@ -140,6 +140,8 @@ export default {
         });
       } else if (command == "cpassword") {
         this.$data.dialogFormVisible = true;
+      } else if (command == "user") {
+        this.$router.push("/usermanager")
       }
     },
     submitForm(formName) {

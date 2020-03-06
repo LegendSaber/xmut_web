@@ -59,7 +59,7 @@
 export default {
   data() {
     return {
-      editId: -1,
+      id: -1,
       fileList: [],
       options: [
         {
@@ -207,6 +207,9 @@ export default {
       params.picture_id = Number(file.id);
       this.$axios.post("/sysFile/deletePicture", params).then(response => {});
     }
+  },
+  beforeDestory() {
+    if (window.sessionStorage.getItem("editKnowledge_id")) window.sessionStorage.removeItem("editKnowledge_id");
   },
   created() {
     let id = window.sessionStorage.getItem("editKnowledge_id");
