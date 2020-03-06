@@ -14,17 +14,17 @@
     <div v-html="essay.content" style="fontSize:20px;"></div>
     <div v-if="images.length > 0">
       <el-divider />
-      <img 
-      v-for="(image, index) in images" 
-      :alt="image.name"
-      :key="index" 
-      :src="image.img"
-      width="304"
-      height="228"
-      @click="showImg(index)"
+      <img
+        v-for="(image, index) in images"
+        :alt="image.name"
+        :key="index"
+        :src="image.img"
+        width="304"
+        height="228"
+        @click="showImg(index)"
       />
       <el-dialog :visible.sync="bigImg.dialogVisible">
-        <img width="100%" :src="bigImg.dialogImageUrl" alt="">
+        <img width="100%" :src="bigImg.dialogImageUrl" alt />
       </el-dialog>
     </div>
     <el-divider />
@@ -129,7 +129,7 @@ export default {
       commentData: [],
       images: [],
       bigImg: {
-        dialogImageUrl: '',
+        dialogImageUrl: "",
         dialogVisible: false
       },
       isCollect: false,
@@ -166,8 +166,8 @@ export default {
   },
   methods: {
     showImg(index) {
-      this.$data.bigImg.dialogImageUrl = this.$data.images[index].img
-      this.$data.bigImg.dialogVisible = true
+      this.$data.bigImg.dialogImageUrl = this.$data.images[index].img;
+      this.$data.bigImg.dialogVisible = true;
     },
     addComment() {
       this.$data.queryComment.selectId = -1;
@@ -435,44 +435,60 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.content.id == null) this.$router.push("/knowledge");
-    this.$data.essay = this.$route.query.content;
+    let knowledge_id = window.sessionStorage.getItem("knowledge_id");
+    if (knowledge_id == null) this.$router.push("/knowledge");
 
-    let params = {};
-    params.id = this.$data.essay.id;
-    this.$axios.post("/sysKnowledge/isCollect", params).then(response => {
-      if (response && response.success) {
-        this.$data.isCollect = true;
-      } else {
-        this.$data.isCollect = false;
-      }
-    });
+    let getParams = {};
+    getParams.id = knowledge_id;
+    this.$axios
+      .get("/sysKnowledge/getKnowledgeById", getParams)
+      .then(response => {
+        if (response && response.success) {
+          this.$data.essay = response.data;
+          this.$data.essay.createTime = this.$data.essay.createTime.slice(0, 10)
 
-    this.$axios.post("/sysKnowledge/isMyKnowledge", params).then(response => {
-      if (response && response.success) {
-        this.$data.isMy = true;
-      } else {
-        this.$data.isMy = false;
-      }
-    });
-    this.getComment();
-    this.$data.queryComment.currentPage =
-      this.$data.queryComment.pageSize / 2 + 1;
-    this.$data.queryComment.pageSize = 2;
+          let params = {};
+          params.id = this.$data.essay.id;
+          this.$axios.post("/sysKnowledge/isCollect", params).then(response => {
+            if (response && response.success) {
+              this.$data.isCollect = true;
+            } else {
+              this.$data.isCollect = false;
+            }
+          });
 
-    this.$axios.post("/sysFile/loadPicture", params).then(response => {
-      if (response && response.success) {
-        let data = response.data;
-        let length = data.length;
+          this.$axios
+            .post("/sysKnowledge/isMyKnowledge", params)
+            .then(response => {
+              if (response && response.success) {
+                this.$data.isMy = true;
+              } else {
+                this.$data.isMy = false;
+              }
+            });
+          this.getComment();
+          this.$data.queryComment.currentPage =
+            this.$data.queryComment.pageSize / 2 + 1;
+          this.$data.queryComment.pageSize = 2;
 
-        for (let i = 0; i < length; i++) {
-          let params = {}
-          params.name = data[i].name
-          params.img = data[i].img
-          this.$data.images.push(params)
+          this.$axios.post("/sysFile/loadPicture", params).then(response => {
+            if (response && response.success) {
+              let data = response.data;
+              let length = data.length;
+
+              for (let i = 0; i < length; i++) {
+                let params = {};
+                params.name = data[i].name;
+                params.img = data[i].img;
+                this.$data.images.push(params);
+              }
+            }
+          });
+        } else {
+          this.$notify.error(response.message);
+          this.$router.push("/knowledge");
         }
-      }
-    })
+      });
   },
   mounted() {
     window.addEventListener("scroll", this.windowScroll);

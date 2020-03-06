@@ -14,8 +14,8 @@
         <el-input :autosize="{minRows:30,maxRows: 30}" type="textarea" v-model="ruleForm.content"></el-input>
       </el-form-item>
       <el-form-item>
-      <div>
-        <el-upload
+        <div>
+          <el-upload
             action="http://localhost:8888/xmut/sysKnowledge/upload"
             list-type="picture-card"
             ref="upload"
@@ -24,13 +24,14 @@
             :file-list="fileList"
             :on-remove="handleRemove"
             :before-upload="beforeAvatarUpload"
-            :on-preview="handlePictureCardPreview">
+            :on-preview="handlePictureCardPreview"
+          >
             <i class="el-icon-plus"></i>
-        </el-upload>
-        <el-dialog :visible.sync="ruleForm.dialogVisible">
-            <img width="100%" :src="ruleForm.dialogImageUrl" alt="">
-        </el-dialog>
-      </div>
+          </el-upload>
+          <el-dialog :visible.sync="ruleForm.dialogVisible">
+            <img width="100%" :src="ruleForm.dialogImageUrl" alt />
+          </el-dialog>
+        </div>
       </el-form-item>
       <el-form-item>
         <div class="demo-drawer__footer">
@@ -58,8 +59,8 @@
 export default {
   data() {
     return {
-      isEdit: false,
-      fileList:[],
+      editId: -1,
+      fileList: [],
       options: [
         {
           value: "数据结构与算法",
@@ -83,7 +84,7 @@ export default {
         title: "",
         content: "",
         value: "",
-        dialogImageUrl: '',
+        dialogImageUrl: "",
         dialogVisible: false
       },
       rules: {
@@ -123,7 +124,7 @@ export default {
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
-        if (this.$data.ruleForm.value == ''){
+        if (this.$data.ruleForm.value == "") {
           this.$alert("请选择文章类别!", "提交结果", {
             confirmButtonText: "确定"
           });
@@ -132,41 +133,43 @@ export default {
         if (valid) {
           let params = {};
 
-          if (!this.$data.isEdit){
+          if (this.$data.id == -1) {
             params.title = this.$data.ruleForm.title;
             if (this.$data.ruleForm.content != null)
               params.content = this.getFormatCode(this.$data.ruleForm.content);
             else params.content = this.$data.ruleForm.content;
-            params.category = this.$data.ruleForm.value 
+            params.category = this.$data.ruleForm.value;
             this.$axios.post("/sysKnowledge/insert", params).then(response => {
               if (response && response.success) {
-                this.$refs.upload.submit()
+                this.$refs.upload.submit();
                 this.$alert(response.message, "提交结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    this.$router.push("/knowledge")
+                    this.$router.push("/knowledge");
                   }
                 });
+              } else {
+                this.$notify.error(response.message);
               }
-            }) 
-          } else{
-            params.id = this.$route.query.content.id
+            });
+          } else {
+            params.id = this.$data.id;
             params.title = this.$data.ruleForm.title;
             if (this.$data.ruleForm.content != null)
               params.content = this.getFormatCode(this.$data.ruleForm.content);
             else params.content = this.$data.ruleForm.content;
-            params.category = this.$data.ruleForm.value 
+            params.category = this.$data.ruleForm.value;
             this.$axios.post("/sysKnowledge/updata", params).then(response => {
               if (response && response.success) {
-                this.$refs.upload.submit()
+                this.$refs.upload.submit();
                 this.$alert(response.message, "提交结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    this.$router.push("/knowledge")
+                    this.$router.push("/knowledge");
                   }
                 });
               }
-            })
+            });
           }
         } else {
           this.$alert("表单信息填写有误，请修改!", "提交结果", {
@@ -177,60 +180,69 @@ export default {
       });
     },
     resetForm(formName) {
-        this.$data.ruleForm.value = ''
-        this.$refs[formName].resetFields();
+      this.$data.ruleForm.value = "";
+      this.$refs[formName].resetFields();
     },
     beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
 
-        if (!isJPG) {
-          this.$message.error('上传图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传图片大小不能超过 2MB!');
-        }
-      
-        return isJPG && isLt2M;
+      if (!isJPG) {
+        this.$message.error("上传图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传图片大小不能超过 2MB!");
+      }
+
+      return isJPG && isLt2M;
     },
     handlePictureCardPreview(file) {
-        this.$data.ruleForm.dialogImageUrl = file.url;
-        this.$data.ruleForm.dialogVisible = true;
+      this.$data.ruleForm.dialogImageUrl = file.url;
+      this.$data.ruleForm.dialogVisible = true;
     },
     handleRemove(file, fileList) {
-      let params = {}
+      let params = {};
 
-      params.knowledge_id = this.$route.query.content.id
-      params.picture_id = Number(file.id)
-      this.$axios.post("/sysFile/deletePicture", params).then(response=>{
-  
-      })
+      params.knowledge_id = this.$data.id;
+      params.picture_id = Number(file.id);
+      this.$axios.post("/sysFile/deletePicture", params).then(response => {});
     }
   },
   created() {
-    if (this.$route.query.content.id != null) {
-      this.$data.isEdit = true
-      let data = this.$route.query.content;
-      this.$data.ruleForm.title = data.title
-      this.$data.ruleForm.content = this.decryptCode(data.content)
-      this.$data.ruleForm.value = data.category
-      let params = {}
+    let id = window.sessionStorage.getItem("editKnowledge_id");
+    if (id != null) {
+      this.$data.id = id
+      let getParams = {};
+      getParams.id = id;
+      this.$axios
+        .get("/sysKnowledge/getKnowledgeById", getParams)
+        .then(response => {
+          if (response && response.success) {
+            let data = response.data;
+            this.$data.ruleForm.title = data.title;
+            this.$data.ruleForm.content = this.decryptCode(data.content);
+            this.$data.ruleForm.value = data.category;
+            let params = {};
 
-      params.id = this.$route.query.content.id
-      this.$axios.get("/sysFile/loadPicture", params).then(response => {
-        if (response && response.success) {
-          let data = response.data;
-          let length = data.length;
+            params.id = id;
+            this.$axios.get("/sysFile/loadPicture", params).then(response => {
+              if (response && response.success) {
+                let data = response.data;
+                let length = data.length;
 
-          for (let i = 0; i < length; i++) {
-            let d = {}
-            d.name = data[i].name
-            d.url = data[i].img
-            d.id = data[i].id
-            this.$data.fileList.push(d)
+                for (let i = 0; i < length; i++) {
+                  let d = {};
+                  d.name = data[i].name;
+                  d.url = data[i].img;
+                  d.id = data[i].id;
+                  this.$data.fileList.push(d);
+                }
+              }
+            });
+          } else {
+            this.$notify.error(response.message);
           }
-        }
-      })
+        });
     }
   }
 };

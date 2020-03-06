@@ -24,7 +24,7 @@ export default {
             this.$axios.get("/sysSign/sign", {}).then(response => {
                 if (response && response.success){
                     this.$notify.success(response.message);
-                    this.$router.push("/sign")
+                    this.$data.isSign = true
                 }
             })       
         }

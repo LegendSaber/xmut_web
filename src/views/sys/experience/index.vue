@@ -73,7 +73,7 @@
       <el-table-column min-width="280" prop="title" label="标题"></el-table-column>
       <el-table-column min-width="280" label="操作">
         <template slot-scope="scope">
-          <el-button @click="show(scope.row)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
+          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
           <el-button
             v-if="queryData.flag == 1"
             icon="el-icon-bell"
@@ -89,7 +89,7 @@
           <el-button
             v-if="queryData.flag == 3"
             icon="el-icon-star-on"
-            @click="cancelCollect(scope.row)"
+            @click="cancelCollect(scope.row.id)"
             type="warning"
             plain
           >已收藏</el-button>
@@ -104,7 +104,7 @@
             v-if="queryData.flag == 4"
             icon="el-icon-delete"
             type="danger"
-            @click="deleteExperience(scope.row)"
+            @click="deleteExperience(scope.row.id)"
             plain
           >删除</el-button>
         </template>
@@ -121,7 +121,6 @@ export default {
       tableData: [],
       loading: true,
       queryData: {
-        hasScroll: true,
         isScroll: false,
         flag: 1,
         currentPage: 0,
@@ -194,10 +193,7 @@ export default {
                         this.$data.dwloading = false;
                         this.$data.dialog = false;
                         this.resetForm("ruleForm");
-                        this.$data.queryData.isScroll = false;
-                        this.$data.queryData.currentPage = 0;
-                        this.$data.queryData.pageSize = 12;
-                        this.getExperienceData(this.$data.queryData.flag);
+                        this.getInitData()
                       }
                     });
                   } else {
@@ -219,10 +215,7 @@ export default {
                         this.$data.dwloading = false;
                         this.$data.dialog = false;
                         this.resetForm("ruleForm");
-                        this.$data.queryData.isScroll = false;
-                        this.$data.queryData.currentPage = 0;
-                        this.$data.queryData.pageSize = 12;
-                        this.getExperienceData(this.$data.queryData.flag);
+                        this.getInitData()
                       }
                     });
                   }
@@ -257,11 +250,6 @@ export default {
     },
     categoryHandle() {
       if (this.$data.oldCategory != this.$data.categoryName) {
-        this.$data.queryData.currentPage = 0;
-        this.$data.queryData.pageSize = 12;
-        this.$data.loading = true;
-        this.$data.queryData.isScroll = false;
-
         if (this.$data.categoryName === "new") {
           this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
@@ -271,33 +259,42 @@ export default {
         } else {
           this.$data.queryData.flag = 4;
         }
-        setTimeout(() => {
-          this.getExperienceData(this.$data.queryData.flag);
-          this.$data.oldCategory = this.$data.categoryName;
-          this.$data.loading = false;
-          document.documentElement.scrollTop = 0;
-          if (!this.$data.queryData.hasScroll) {
-            this.$data.queryData.hasScroll = true;
-            window.addEventListener("scroll", this.windowScroll);
-          }
-        }, 2000);
+        this.getInitData()
+        this.$data.oldCategory = this.$data.categoryName
       }
     },
-    getExperienceData(flag) {
+    getInitData(){
+      this.$data.queryData.currentPage = 0;
+      this.$data.queryData.pageSize = 12;
+      this.$data.loading = true;
+      this.$data.queryData.isScroll = false;
+
+      setTimeout(() => {
+        this.getExperienceData();
+        window.addEventListener("scroll", this.windowScroll);
+        this.$data.queryData.currentPage =
+          this.$data.queryData.pageSize / 2 + 1;
+        this.$data.queryData.pageSize = 2;
+        document.documentElement.scrollTop = 0;
+        this.$data.loading = false;
+      }, 2000);
+    },
+    getExperienceData() {
+      let flag = this.$data.queryData.flag
       let params = {};
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
 
       if (flag == 1 || flag == 2) {
         params.flag = flag;
-        this.$axios.post("/sysExperience/getAll", params).then(response => {
+        this.$axios.get("/sysExperience/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
       } else if (flag == 3) {
         this.$axios
-          .post("/sysExperience/getFavorExperience", params)
+          .get("/sysExperience/getFavorExperience", params)
           .then(response => {
             if (response && response.success) {
               this.setData(response.data);
@@ -305,7 +302,7 @@ export default {
           });
       } else if (flag == 4) {
         this.$axios
-          .post("/sysExperience/getMyExperience", params)
+          .get("/sysExperience/getMyExperience", params)
           .then(response => {
             if (response && response.success) {
               this.setData(response.data);
@@ -319,24 +316,9 @@ export default {
         return;
       }
       let tmpData = data.records;
-      let size = tmpData.length;
-
-      if (this.$data.queryData.isScroll) {
-        for (let i = 0; i < size; i++) {
-          tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
-          tmpData[i].modifyTime = tmpData[i].modifyTime.slice(0, 10);
-          this.$data.tableData.push(tmpData[i]);
-        }
-        if (size < 2) {
-          this.$notify.error("没有更多数据");
-          this.$data.queryData.hasScroll = false;
-          window.removeEventListener("scroll", this.windowScroll);
-        } else {
-          this.$data.queryData.currentPage++;
-        }
-      } else {
+      let length = tmpData.length;
+      if (!this.$data.queryData.isScroll) {
         this.$data.tableData = tmpData;
-        let length = this.$data.tableData.length;
 
         for (let i = 0; i < length; i++) {
           this.$data.tableData[i].createTime = this.$data.tableData[
@@ -346,13 +328,19 @@ export default {
             i
           ].modifyTime.slice(0, 10);
         }
-
-        if (size < this.$data.queryData.pageSize) {
-          this.$data.queryData.hasScroll = false;
-          window.removeEventListener("scroll", this.windowScroll);
+      } else {
+        for (let i = 0; i < length; i++) {
+          tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
+          tmpData[i].modifyTime = tmpData[i].modifyTime.slice(0, 10);
+          this.$data.tableData.push(tmpData[i]);
         }
-        this.$data.queryData.currentPage = size / 2 + 1;
-        this.$data.queryData.pageSize = 2;
+        if (length == 2) {
+          this.$data.queryData.currentPage++;
+        }
+      }
+      if (length < this.$data.queryData.pageSize) {
+        this.$notify.error("没有更多数据");
+        window.removeEventListener("scroll", this.windowScroll);
       }
     },
     tableRowClassName({ row, rowIndex }) {
@@ -361,14 +349,15 @@ export default {
       }
       return "";
     },
-    show(row) {
-      this.$router.push({ path: "/exdetail", query: { content: row } });
+    show(id) {
+      window.sessionStorage.setItem("experience_id", id)
+      this.$router.push("/exdetail");
     },
-    cancelCollect(row) {
+    cancelCollect(id) {
       this.$confirm("确定要取消收藏吗? ").then(_ => {
         this.$data.loading = true;
         let params = {};
-        params.id = row.id;
+        params.id = id;
 
         setTimeout(() => {
           this.$axios
@@ -378,11 +367,7 @@ export default {
                 this.$alert(response.message, "取消结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    this.$data.loading = false;
-                    this.$data.queryData.isScroll = false;
-                    this.$data.queryData.currentPage = 0;
-                    this.$data.queryData.pageSize = 12;
-                    this.getExperienceData(this.$data.queryData.flag);
+                    this.getInitData()
                   }
                 });
               }
@@ -396,7 +381,7 @@ export default {
       this.$data.ruleForm.content = this.decryptCode(row.content);
       this.$data.dialog = true;
     },
-    deleteExperience(row) {
+    deleteExperience(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -405,7 +390,7 @@ export default {
       }).then(() => {
         this.loading = true;
         let params = {};
-        params.id = row.id;
+        params.id = id;
         setTimeout(() => {
           this.$axios
             .post("/sysExperience/deleteExperience", params)
@@ -414,11 +399,7 @@ export default {
                 this.$alert(response.message, "删除结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    this.$data.loading = false;
-                    this.$data.queryData.isScroll = false;
-                    this.$data.queryData.currentPage = 0;
-                    this.$data.queryData.pageSize = 12;
-                    this.getExperienceData(this.$data.queryData.flag);
+                    this.getInitData()
                   }
                 });
               }
@@ -441,7 +422,7 @@ export default {
         setTimeout(() => {
           document.documentElement.scrollTop = scrollTop - 10;
           this.$data.queryData.isScroll = true;
-          this.getExperienceData(this.$data.queryData.flag);
+          this.getExperienceData();
           this.$data.loading = false;
         }, 2000);
       }
@@ -451,10 +432,7 @@ export default {
     window.addEventListener("scroll", this.windowScroll);
   },
   created() {
-    setTimeout(() => {
-      this.getExperienceData(this.$data.queryData.flag);
-      this.$data.loading = false;
-    }, 2000);
+    this.getInitData()
   },
   beforeDestroy() {
     window.removeEventListener("scroll", this.windowScroll);

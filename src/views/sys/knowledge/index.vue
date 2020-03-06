@@ -49,7 +49,7 @@
       <el-table-column min-width="240" prop="title" label="标题"></el-table-column>
       <el-table-column min-width="350" label="操作">
         <template slot-scope="scope">
-          <el-button @click="show(scope.row)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
+          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
           <el-button
             v-if="queryData.flag == 1"
             icon="el-icon-bell"
@@ -73,7 +73,7 @@
             v-if="queryData.flag == 4"
             icon="el-icon-edit"
             type="warning"
-            @click="editKnowledge(scope.row)"
+            @click="editKnowledge(scope.row.id)"
             plain
           >编辑</el-button>
           <el-button
@@ -144,8 +144,9 @@ export default {
         this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    show(row) {
-      this.$router.push({ path: "/kndetail", query: { content: row } });
+    show(id) {
+      window.sessionStorage.setItem("knowledge_id", id);
+      this.$router.push("/kndetail");
     },
     cancelCollect(id) {
       this.$confirm("确定要取消收藏吗? ").then(_ => {
@@ -160,8 +161,9 @@ export default {
         });
       });
     },
-    editKnowledge(row){
-      this.$router.push({ path: "/addKnowledge", query: { content: row } });
+    editKnowledge(id){
+      window.sessionStorage.setItem("editKnowledge_id", id);
+      this.$router.push("/addKnowledge");
     },
     deleteKnowledge(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
@@ -207,19 +209,19 @@ export default {
       params.category = this.$data.queryData.category
       if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
         params.flag = this.$data.queryData.flag;
-        this.$axios.post("/sysKnowledge/getAll", params).then(response => {
+        this.$axios.get("/sysKnowledge/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
       } else if (this.$data.queryData.flag == 3) {
-        this.$axios.post("/sysKnowledge/getFavorKnowledge", params).then(response => {
+        this.$axios.get("/sysKnowledge/getFavorKnowledge", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
       } else {
-        this.$axios.post("/sysKnowledge/getMyKnowledge", params).then(response => {
+        this.$axios.get("/sysKnowledge/getMyKnowledge", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }

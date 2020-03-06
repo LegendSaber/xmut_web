@@ -405,29 +405,39 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.content.id == null) this.$router.push("/experience");
-    this.$data.essay = this.$route.query.content;
-    let params = {};
-    params.id = this.$data.essay.id;
-    this.$axios.post("/collect/getExCollect", params).then(response => {
+    let id = window.sessionStorage.getItem("experience_id")
+    if (id == null) this.$router.push("/experience");
+    let getParams = {}
+    getParams.id = id
+    this.$axios.get("/sysExperience/getExperienceById", getParams).then(response => {
       if (response && response.success) {
-        this.$data.isCollect = true;
-      } else {
-        this.$data.isCollect = false;
-      }
-    });
+        this.$data.essay = response.data;
+        let params = {};
+        params.id = this.$data.essay.id;
+        this.$axios.get("/collect/getExCollect", params).then(response => {
+          if (response && response.success) {
+            this.$data.isCollect = true;
+          } else {
+            this.$data.isCollect = false;
+          }
+        });
 
-    this.$axios.post("/sysExperience/isMyExperience", params).then(response => {
-      if (response && response.success) {
-        this.$data.isMy = true;
+        this.$axios.get("/sysExperience/isMyExperience", params).then(response => {
+          if (response && response.success) {
+            this.$data.isMy = true;
+          } else {
+            this.$data.isMy = false;
+          }
+        });
+        this.getComment();
+        this.$data.queryComment.currentPage =
+          this.$data.queryComment.pageSize / 2 + 1;
+        this.$data.queryComment.pageSize = 2;
       } else {
-        this.$data.isMy = false;
+        this.$notify.error(response.message)
+        this.$router.push("/experience")
       }
-    });
-    this.getComment();
-    this.$data.queryComment.currentPage =
-      this.$data.queryComment.pageSize / 2 + 1;
-    this.$data.queryComment.pageSize = 2;
+    })
   },
   mounted() {
     window.addEventListener("scroll", this.windowScroll);
