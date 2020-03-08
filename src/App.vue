@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <o-backtop/>
-    <router-view />
+      <o-backtop/>
+      <router-view />
   </div>
 </template>
 

@@ -1,12 +1,10 @@
 <template>
-  <el-container style="height: 100%; border: 1px solid #eee">
-      <el-header id="homeheader">
+  <el-container>
+      <el-header>
         <origin-header></origin-header>
       </el-header>
       <el-main>
-        <div id="main">
-          <origin-main></origin-main>
-        </div>
+        <origin-main></origin-main>
       </el-main>
   </el-container>
 </template>
@@ -32,16 +30,14 @@ export default {
 };
 </script>
 <style>
-#homeheader {
-    background-color: #B3C0D1;
-    color: #333;
+.el-header {
     line-height: 60px;
-    text-align: right;
+    color: #333;
+    text-align: center;
     font-size: 20px;
 }
-#main{
-  width: 55%;
-  height: 100%;
-  margin: 0 auto;
+.el-main{
+  background-color: #EAEDF1;
+  background: url("../../assets/images/main.jpg");
 }
 </style>

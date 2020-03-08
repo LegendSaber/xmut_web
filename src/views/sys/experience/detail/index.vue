@@ -2,7 +2,7 @@
   <div>
     <h1 style="fontSize:30px;">{{essay.title}}</h1>
     <div class="author-info">
-      <el-button type="primary" plain style="fontSize:14px;">{{essay.author}}</el-button>
+      <el-button type="primary" style="fontSize:14px;">{{essay.author}}</el-button>
       <el-divider direction="vertical"></el-divider>
       <span style="fontSize:18px;">发表于: {{essay.createTime}}</span>
       <el-divider direction="vertical"></el-divider>
@@ -91,7 +91,6 @@
               <span>回复于: {{son.createTime}}</span>
             </div>
           </el-col>
-
           <el-col>
             <el-divider />
           </el-col>
@@ -412,6 +411,7 @@ export default {
     this.$axios.get("/sysExperience/getExperienceById", getParams).then(response => {
       if (response && response.success) {
         this.$data.essay = response.data;
+        this.$data.essay.createTime = this.$data.essay.createTime.slice(0, 10)
         let params = {};
         params.id = this.$data.essay.id;
         this.$axios.get("/collect/getExCollect", params).then(response => {

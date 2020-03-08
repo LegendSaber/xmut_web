@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-row :gutter="2">
+      <el-row>
         <el-col :span="7" :offset="4">
           <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="主页" name="first"></el-tab-pane>
@@ -11,15 +11,15 @@
             <el-tab-pane label="资料分享区" name="five"></el-tab-pane>
           </el-tabs>
         </el-col>
-        <el-col :span="3" :offset="1">
+        <el-col :offset="1" :span="3">
           <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="input" />
         </el-col>
         <el-col :span="1">
           <el-button type="primary" icon="el-icon-search">搜索</el-button>
         </el-col>
-        <el-col :span="6">
+        <el-col :offset="2" :span="2">
           <el-dropdown @command="handleCommand">
-            <i class="el-icon-setting"></i>
+            <i class="el-icon-user-solid"></i>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="user">个人中心</el-dropdown-item>
               <el-dropdown-item command="cpassword">修改密码</el-dropdown-item>
@@ -27,49 +27,43 @@
             </el-dropdown-menu>
           </el-dropdown>
           <span>{{currentUser.username}}</span>
-          <el-badge value="new" class="item">
-            <el-button type="warning" plain>评论</el-button>
-          </el-badge>
-          <el-badge value="hot" class="item">
-            <el-button type="danger" plain>回复</el-button>
-          </el-badge>
         </el-col>
       </el-row>
     </div>
-    <el-dialog
-      title="修改密码"
-      :visible.sync="dialogFormVisible"
-      :before-close="dialogclose"
-      width="30%"
-      :center="true"
-    >
-      <el-form
-        :model="ruleForm"
-        status-icon
-        :rules="rules"
-        ref="ruleForm"
-        label-width="80px"
-        class="demo-ruleForm"
+      <el-dialog
+        title="修改密码"
+        :visible.sync="dialogFormVisible"
+        :before-close="dialogclose"
+        width="30%"
+        :center="true"
       >
-        <el-form-item label="旧密码:" prop="oldPass">
-          <el-input type="password" v-model="ruleForm.oldPass" autocomplete="off" show-password></el-input>
-        </el-form-item>
-        <el-form-item label="密码:" prop="pass">
-          <el-input type="password" v-model="ruleForm.pass" autocomplete="off" show-password></el-input>
-        </el-form-item>
-        <el-form-item label="确认密码:" prop="checkPass">
-          <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off" show-password></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            v-loading.fullscreen.lock="fullscreenLoading"
-            type="primary"
-            @click="submitForm('ruleForm')"
-          >提交</el-button>
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
+        <el-form
+          :model="ruleForm"
+          status-icon
+          :rules="rules"
+          ref="ruleForm"
+          label-width="80px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="旧密码:" prop="oldPass">
+            <el-input type="password" v-model="ruleForm.oldPass" autocomplete="off" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="密码:" prop="pass">
+            <el-input type="password" v-model="ruleForm.pass" autocomplete="off" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码:" prop="checkPass">
+            <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off" show-password></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              v-loading.fullscreen.lock="fullscreenLoading"
+              type="primary"
+              @click="submitForm('ruleForm')"
+            >提交</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
   </div>
 </template>
 <script>
@@ -141,7 +135,7 @@ export default {
       } else if (command == "cpassword") {
         this.$data.dialogFormVisible = true;
       } else if (command == "user") {
-        this.$router.push("/usermanager")
+        this.$router.push("/usermanager");
       }
     },
     submitForm(formName) {
@@ -159,25 +153,25 @@ export default {
           params.newPass = this.$data.ruleForm.pass;
           setTimeout(() => {
             this.$axios.post("/sysUser/cpassword", params).then(response => {
-              loading.close()
+              loading.close();
               if (response && response.success) {
                 this.$alert(response.message, "修改结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    window.sessionStorage.removeItem('user')
-                    this.$router.push("/login")
+                    window.sessionStorage.removeItem("user");
+                    this.$router.push("/login");
                   }
-                })
+                });
               } else {
                 this.$alert(response.message, "修改结果", {
                   confirmButtonText: "确定",
                   callback: action => {
-                    this.resetForm("ruleForm")
+                    this.resetForm("ruleForm");
                   }
-                })
+                });
               }
-            })
-          }, 2000)
+            });
+          }, 2000);
         } else {
           this.$notify.error("表单填写方式错误，请检查");
           return false;
@@ -206,9 +200,12 @@ export default {
       ) {
         this.$router.push("/experience");
       } else if (this.activeName === "five" && this.$route.path != "/file") {
-        this.$router.push("/file")
-      } else if (this.activeName === "fourth" && this.$route.path != "/knowledge"){
-        this.$router.push("/knowledge")
+        this.$router.push("/file");
+      } else if (
+        this.activeName === "fourth" &&
+        this.$route.path != "/knowledge"
+      ) {
+        this.$router.push("/knowledge");
       }
     }
   },
@@ -224,9 +221,4 @@ export default {
 };
 </script>
 <style>
-.item {
-  margin-top: 0px;
-  margin-right: 15px;
-  margin-left: 5px;
-}
 </style>
