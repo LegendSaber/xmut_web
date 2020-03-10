@@ -1,9 +1,9 @@
 <template>
     <div>
         <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item :to="{ path: '/mydata' }">个人中心</el-breadcrumb-item>
-        <el-breadcrumb-item>知识模块</el-breadcrumb-item>
-        <el-breadcrumb-item>我的知识</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/mydata' }">个人中心</el-breadcrumb-item>
+            <el-breadcrumb-item>知识模块</el-breadcrumb-item>
+            <el-breadcrumb-item>我的收藏</el-breadcrumb-item>
         </el-breadcrumb>
 
         <el-card class="box-card">
@@ -30,12 +30,11 @@
             <el-table-column label="操作">
             <template slot-scope="scope">
                 <el-tooltip effect="dark" content="查看" placement="right-start" :enterable="false">
-                <a :href="'kndetail?id=' + scope.row.id"><el-button type="primary" icon="el-icon-zoom-in"></el-button></a>
+                    <a :href="'kndetail?id=' + scope.row.id"><el-button type="primary" icon="el-icon-zoom-in"></el-button></a>
                 </el-tooltip>
-                <el-tooltip effect="dark" content="编辑" placement="right-start" :enterable="false">
-                <a :href="'kndetail?id=' + scope.row.id"><el-button type="warning" icon="el-icon-setting"></el-button></a>
-                </el-tooltip>
-                <el-button @click="deleteKnowledge(scope.row.id)" type="danger" icon="el-icon-delete"></el-button>
+                <el-tooltip effect="dark" content="取消收藏" placement="right-start" :enterable="false">
+                        <el-button @click="cancelCollect(scope.row.id)" type="warning" icon="el-icon-star-on"></el-button>
+                </el-tooltip>  
             </template>
             </el-table-column>
         </el-table>
@@ -70,28 +69,13 @@ export default {
         this.getKnowledgeList();
     },
     methods: {
-        deleteKnowledge(id) {
-          this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning",
-            center: true
-          }).then(() => {
-            let params = {};
-            params.id = id;
-
-            this.$axios
-              .post("/sysKnowledge/delete", params)
-              .then(response => {
-                if (response && response.success) {
-                  this.$alert(response.message, "删除结果", {
-                    confirmButtonText: "确定",
-                    callback: action => {
-                      this.getKnowledgeList()
-                    }
-                  });
-                }
-              });
+        cancelCollect(id) {
+          let params = {};
+          params.id = id;
+          this.$axios.post("/sysKnowledge/cancelCollect", params).then(response => {
+            if (response && response.success) {
+              this.getKnowledgeList()
+            }
           });
         },
         getKnowledgeList() {
@@ -101,17 +85,17 @@ export default {
             params.pageSize = this.$data.queryInfo.pageSize;
             params.query = this.$data.queryInfo.query;
       
-            this.$axios.get("/sysKnowledge/getMyKnowledge", params).then(response => {
+            this.$axios.get("/sysKnowledge/getFavorKnowledge", params).then(response => {
                 if (response && response.success) {
-                this.$data.knowledgeList = response.data.records;
-                this.$data.total = response.data.total;
-                let len = response.data.records.length;
+                    this.$data.knowledgeList = response.data.records;
+                    this.$data.total = response.data.total;
+                    let len = response.data.records.length;
 
-                for (let i = 0; i < len; i++) {
-                    this.$data.knowledgeList[i].createTime = this.$data.knowledgeList[
-                    i
-                    ].createTime.slice(0, 10);
-                }
+                    for (let i = 0; i < len; i++) {
+                        this.$data.knowledgeList[i].createTime = this.$data.knowledgeList[
+                        i
+                        ].createTime.slice(0, 10);
+                    }
                 }
             });
         },

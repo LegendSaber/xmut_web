@@ -58,56 +58,6 @@
       <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
       <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
     </el-tabs>
-    <!-- <el-table
-      :data="tableData"
-      border
-      :row-class-name="tableRowClassName"
-      style="width: 100%;fontSize:18px"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-    >
-      <el-table-column min-width="130" prop="createTime" label="日期"></el-table-column>
-      <el-table-column min-width="130" prop="author" label="作者"></el-table-column>
-      <el-table-column min-width="280" prop="title" label="标题"></el-table-column>
-      <el-table-column min-width="280" label="操作">
-        <template slot-scope="scope">
-          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
-          <el-button
-            v-if="queryData.flag == 1"
-            icon="el-icon-bell"
-            type="success"
-            plain
-          >更新日期:{{scope.row.modifyTime}}</el-button>
-          <el-button
-            v-if="queryData.flag == 2"
-            icon="el-icon-user"
-            type="warning"
-            plain
-          >收藏人数:{{scope.row.favorNum}}</el-button>
-          <el-button
-            v-if="queryData.flag == 3"
-            icon="el-icon-star-on"
-            @click="cancelCollect(scope.row.id)"
-            type="warning"
-            plain
-          >已收藏</el-button>
-          <el-button
-            v-if="queryData.flag == 4"
-            icon="el-icon-edit"
-            type="warning"
-            @click="editExperience(scope.row)"
-            plain
-          >编辑</el-button>
-          <el-button
-            v-if="queryData.flag == 4"
-            icon="el-icon-delete"
-            type="danger"
-            @click="deleteExperience(scope.row.id)"
-            plain
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table> -->
      <div style="height:140px;" v-for="(table, index) in tableData" :key="index">
       <el-row v-loading="loading" :gutter="2">
           <el-col style="margin-top: 40px;" :offset="1" :span="2">
@@ -277,11 +227,7 @@ export default {
           this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
           this.$data.queryData.flag = 2;
-        } else if (this.$data.categoryName === "collect") {
-          this.$data.queryData.flag = 3;
-        } else {
-          this.$data.queryData.flag = 4;
-        }
+        } 
         this.getInitData()
         this.$data.oldCategory = this.$data.categoryName
       }
@@ -307,31 +253,13 @@ export default {
       let params = {};
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
-
-      if (flag == 1 || flag == 2) {
-        params.flag = flag;
-        this.$axios.get("/sysExperience/getAll", params).then(response => {
+      params.flag = flag;
+      
+      this.$axios.get("/sysExperience/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
-        });
-      } else if (flag == 3) {
-        this.$axios
-          .get("/sysExperience/getFavorExperience", params)
-          .then(response => {
-            if (response && response.success) {
-              this.setData(response.data);
-            }
-          });
-      } else if (flag == 4) {
-        this.$axios
-          .get("/sysExperience/getMyExperience", params)
-          .then(response => {
-            if (response && response.success) {
-              this.setData(response.data);
-            }
-          });
-      }
+        }); 
     },
     setData(data) {
       if (data == null) {
@@ -366,69 +294,11 @@ export default {
         window.removeEventListener("scroll", this.windowScroll);
       }
     },
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 == 0) {
-        return "warning-row";
-      }
-      return "";
-    },
-    show(id) {
-      window.sessionStorage.setItem("experience_id", id)
-      this.$router.push("/exdetail");
-    },
-    cancelCollect(id) {
-      this.$confirm("确定要取消收藏吗? ").then(_ => {
-        this.$data.loading = true;
-        let params = {};
-        params.id = id;
-
-        setTimeout(() => {
-          this.$axios
-            .post("/collect/cancelCollectEx", params)
-            .then(response => {
-              if (response && response.success) {
-                this.$alert(response.message, "取消结果", {
-                  confirmButtonText: "确定",
-                  callback: action => {
-                    this.getInitData()
-                  }
-                });
-              }
-            });
-        }, 2000);
-      });
-    },
     editExperience(row) {
       this.$data.ruleForm.essayId = row.id;
       this.$data.ruleForm.title = row.title;
       this.$data.ruleForm.content = this.decryptCode(row.content);
       this.$data.dialog = true;
-    },
-    deleteExperience(id) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        center: true
-      }).then(() => {
-        this.loading = true;
-        let params = {};
-        params.id = id;
-        setTimeout(() => {
-          this.$axios
-            .post("/sysExperience/deleteExperience", params)
-            .then(response => {
-              if (response && response.success) {
-                this.$alert(response.message, "删除结果", {
-                  confirmButtonText: "确定",
-                  callback: action => {
-                    this.getInitData()
-                  }
-                });
-              }
-            });
-        }, 2000);
-      });
     },
     windowScroll() {
       //滚动条滚动时距离顶部的距离

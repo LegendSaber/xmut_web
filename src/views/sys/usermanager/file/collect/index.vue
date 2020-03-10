@@ -3,7 +3,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/mydata' }">个人中心</el-breadcrumb-item>
       <el-breadcrumb-item>文件模块</el-breadcrumb-item>
-      <el-breadcrumb-item>我的文件</el-breadcrumb-item>
+      <el-breadcrumb-item>我的收藏</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card class="box-card">
@@ -24,9 +24,11 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="下载" placement="right-start" :enterable="false">
-                <el-button @click="download(scope.row.id)" type="primary" icon="el-icon-download"></el-button>
+              <el-button @click="download(scope.row.id)" type="primary" icon="el-icon-download"></el-button>
             </el-tooltip>
-            <el-button @click="deleteFile(scope.row.id)" type="danger" icon="el-icon-delete"></el-button>
+            <el-tooltip effect="dark" content="取消收藏" placement="right-start" :enterable="false">
+                <el-button @click="cancelCollect(scope.row.id)" type="warning" icon="el-icon-star-on"></el-button>
+            </el-tooltip>      
           </template>
         </el-table-column>
       </el-table>
@@ -90,7 +92,7 @@ export default {
       params.pageSize = this.$data.queryInfo.pageSize;
       params.query = this.$data.queryInfo.query;
 
-      this.$axios.get("/sysFile/getMyFile", params).then(response => {
+      this.$axios.get("/sysFile/getMyCollect", params).then(response => {
         if (response && response.success) {
           this.$data.fileList = response.data.records;
           this.$data.total = response.data.total;
@@ -105,15 +107,24 @@ export default {
       });
     },
     handleSizeChange(newSize) {
-        this.$data.queryInfo.pageSize = newSize;
-        this.getFileList();
+      this.$data.queryInfo.pageSize = newSize;
+      this.getFileList();
     },
     handleCurrentChange(newPage) {
-        this.$data.queryInfo.currentPage = newPage;
-        this.getFileList();
+      this.$data.queryInfo.currentPage = newPage;
+      this.getFileList();
     },
     download(id) {
-        window.open("http://localhost:8888/xmut/sysFile/download?id=" + id)
+      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id);
+    },
+    cancelCollect(id) {
+      let params = {};
+      params.id = id;
+      this.$axios.post("/sysFile/cancelCollect", params).then(response => {
+        if (response && response.success) {
+          this.getFileList();
+        }
+      });
     }
   }
 };

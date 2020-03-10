@@ -41,7 +41,6 @@ export default {
         let currentUser = JSON.parse(window.sessionStorage.getItem("user")) 
         if (currentUser) {
             this.$data.currentUser = currentUser
-            console.log( this.$data.currentUser)
         }   else {
             this.$router.push('/')
         }

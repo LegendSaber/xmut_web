@@ -61,20 +61,6 @@
           <span slot="title">我的收藏</span>
         </el-menu-item>
       </el-submenu>
-      <el-submenu index="6">
-        <template slot="title">
-          <i class="el-icon-s-comment"></i>
-          <span>评论/回复</span>
-        </template>
-        <el-menu-item index="6-1">
-          <i class="el-icon-s-unfold"></i>
-          <span slot="title">我的评论</span>
-        </el-menu-item>
-        <el-menu-item index="6-2">
-          <i class="el-icon-s-flag"></i>
-          <span slot="title">我的回复</span>
-        </el-menu-item>
-      </el-submenu>
     </el-menu>
   </div>
 </template>
@@ -105,7 +91,7 @@ export default {
       } else if (index == "3-1"){
         if (this.$route.path != "/myknowledge") this.$router.push("/myknowledge")
       } else if (index == "3-2"){
-        if (this.$route.path != "/colleckn") this.$router.push("/colleckn")
+        if (this.$route.path != "/collectkn") this.$router.push("/collectkn")
       } else if (index == "4-1"){
         if (this.$route.path != "/myfile") this.$router.push("/myfile")  
       }else if (index == "4-2"){

@@ -124,13 +124,67 @@ export default new Router({
             }]
         },
         {
+            path: '/collectex',
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/experience/collect/index")
+            }]
+        },
+        {
             path: "/mydata",
             name: "MyData",
             component: mangerLayout,
             children: [{
                 path: '/',
                 component: () =>
-                    import ("../views/sys/usermanager/my/index")
+                    import ("../views/sys/usermanager/my/data/index")
+            }]
+        },
+        {
+            path: "/myknowledge",
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/knowledge/my/index")
+            }]
+        },
+        {
+            path: "/collectkn",
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/knowledge/collect/index")
+            }]
+        },
+        {
+            path: '/myfile',
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/file/my/index")
+            }]
+        },
+        {
+            path: '/collectfile',
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/file/collect/index")
+            }]
+        },
+        {
+            path: '/mysign',
+            component: mangerLayout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/usermanager/my/sign/index")
             }]
         }
     ]

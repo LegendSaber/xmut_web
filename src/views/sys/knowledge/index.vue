@@ -34,60 +34,6 @@
         </el-col>
       </el-row>
     </div>
-    <!-- <el-table
-      :data="tableData"
-      border
-      :row-class-name="tableRowClassName"
-      style="width: 100%;fontSize:18px"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-    >
-      <el-table-column min-width="120" prop="createTime" label="日期"></el-table-column>
-      <el-table-column min-width="110" prop="author" label="作者"></el-table-column>
-      <el-table-column min-width="240" prop="title" label="标题"></el-table-column>
-      <el-table-column min-width="350" label="操作">
-        <template slot-scope="scope">
-          <el-button @click="show(scope.row.id)" icon="el-icon-zoom-in" type="primary" plain>查看</el-button>
-          <el-button
-            v-if="queryData.flag == 1"
-            icon="el-icon-bell"
-            type="success"
-            plain
-          >更新日期:{{scope.row.modifyTime}}</el-button>
-          <el-button
-            v-if="queryData.flag == 2"
-            icon="el-icon-user"
-            type="warning"
-            plain
-          >收藏人数:{{scope.row.favorNum}}</el-button>
-          <el-button
-            v-if="queryData.flag == 3"
-            icon="el-icon-star-on"
-            @click="cancelCollect(scope.row.id)"
-            type="warning"
-            plain
-          >已收藏</el-button>
-          <el-button
-            v-if="queryData.flag == 4"
-            icon="el-icon-edit"
-            type="warning"
-            @click="editKnowledge(scope.row.id)"
-            plain
-          >编辑</el-button>
-          <el-button
-            v-if="queryData.flag == 4"
-            icon="el-icon-delete"
-            type="danger"
-            @click="deleteKnowledge(scope.row.id)"
-            plain
-          >删除</el-button>
-          <el-button
-            type="info"
-            plain
-          >{{scope.row.category}}</el-button>
-        </template>
-      </el-table-column>
-    </el-table> -->
     <div style="height:140px;" v-for="(table, index) in tableData" :key="index">
       <el-row v-loading="loading" :gutter="2">
           <el-col style="margin-top: 40px;" :offset="1" :span="2">
@@ -166,62 +112,14 @@ export default {
           this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
           this.$data.queryData.flag = 2;
-        } else if (this.$data.categoryName === "collect") {
-          this.$data.queryData.flag = 3;
-        } else {
-          this.$data.queryData.flag = 4;
-        }
+        } 
         this.getInitData();
         this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    cancelCollect(id) {
-      this.$confirm("确定要取消收藏吗? ").then(_ => {
-        let params = {};
-        params.id = id;
-
-        this.$axios.post("/sysKnowledge/cancelCollect", params).then(response => {
-          if (response && response.success) {
-            this.$notify.success(response.message);
-            this.getInitData();
-          }
-        });
-      });
-    },
-    collect(id) {
-      let params = {};
-      params.id = id;
-      this.$axios.post("/sysKnowledge/collect", params).then(response => {
-        if (response && response.success) {
-          this.$notify.success(response.message)
-        }
-      });
-    },
     editKnowledge(id){
       window.sessionStorage.setItem("editKnowledge_id", id);
       this.$router.push("/addKnowledge");
-    },
-    deleteKnowledge(id) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        center: true
-      }).then(() => {
-        let params = {};
-        params.id = id;
-
-        this.$axios.post("sysKnowledge/delete", params).then(response => {
-          if (response && response.success) {
-            this.$alert(response.message, "删除结果", {
-              confirmButtonText: "确定",
-              callback: action => {
-                this.getInitData();
-              }
-            });
-          }
-        });
-      });
     },
     getInitData() {
       this.$data.queryData.currentPage = 0;
@@ -243,26 +141,13 @@ export default {
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
       params.category = this.$data.queryData.category
-      if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
-        params.flag = this.$data.queryData.flag;
+      params.flag = this.$data.queryData.flag;
+
         this.$axios.get("/sysKnowledge/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
-      } else if (this.$data.queryData.flag == 3) {
-        this.$axios.get("/sysKnowledge/getFavorKnowledge", params).then(response => {
-          if (response && response.success) {
-            this.setData(response.data);
-          }
-        });
-      } else {
-        this.$axios.get("/sysKnowledge/getMyKnowledge", params).then(response => {
-          if (response && response.success) {
-            this.setData(response.data);
-          }
-        });
-      }
     },
     setData(data) {
       if (data == null) {
