@@ -2,11 +2,11 @@
   <div>
     <h1 style="fontSize:30px;">{{essay.title}}</h1>
     <div class="author-info">
-      <el-button type="primary" style="fontSize:14px;">{{essay.author}}</el-button>
+      <el-button type="primary" style="fontSize:12px;">{{essay.author}}</el-button>
       <el-divider direction="vertical"></el-divider>
-      <el-button type="success" style="fontSize:14px;">{{essay.category}}</el-button>
+      <el-button type="success" style="fontSize:12px;">{{essay.category}}</el-button>
       <el-divider direction="vertical"></el-divider>
-      <span style="fontSize:18px;">发表于: {{essay.createTime}}</span>
+      <span>发表于: {{essay.createTime}}</span>
       <el-divider direction="vertical"></el-divider>
       <span>收藏人数: {{essay.favorNum}}</span>
     </div>
@@ -76,10 +76,9 @@
           <el-avatar shape="square" :size="50" :src="squareUrl"></el-avatar>
         </el-col>
         <el-col :span="19" :offset="1">
-          <div style="fontSize: 20px;" v-html="comment.content"></div>
-          <br />
-          <div style="fontSize:10px;">
-            <el-link type="primary">{{comment.author}}</el-link>
+          <div style="fontSize: 16px;" v-html="comment.content"></div>
+          <div class="comment">
+            <span style="color:#3b5998;cursor: pointer;" type="primary">{{comment.author}}</span>
             <el-divider direction="vertical"></el-divider>
             <span>发表于: {{comment.createTime}}</span>
             <el-divider direction="vertical"></el-divider>
@@ -90,29 +89,31 @@
             <el-link @click="replace(comment)" type="danger">回复</el-link>
           </div>
         </el-col>
-        <el-col>
-          <el-divider />
-        </el-col>
       </el-row>
       <div v-for="(son, index) in comment.sonComment" :key="index">
         <el-row>
-          <el-col :span="1" :offset="2">
-            <el-avatar :size="50" :src="circleUrl"></el-avatar>
+          <el-col :offset="3">
+            <el-divider><i class="el-icon-s-comment"></i></el-divider>
           </el-col>
-          <el-col :span="20" :offset="1">
-            <div style="fontSize: 15px;" v-html="son.content"></div>
-            <br />
-            <div style="fontSize: 10px;">
+        </el-row>
+        <el-row>
+          <el-col :span="6" :offset="3">
+            <div style="fontSize: 16px;" v-html="son.content"></div>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :offset="3" :span="5">
+            <div style="margin-top:10px;fontSize: 14px;">
               <el-link type="success">{{son.author}}</el-link>
               <el-divider direction="vertical"></el-divider>
               <span>回复于: {{son.createTime}}</span>
             </div>
           </el-col>
-          <el-col>
-            <el-divider />
-          </el-col>
         </el-row>
       </div>
+      <el-row>
+        <el-divider><i class="el-icon-s-data"></i></el-divider>
+      </el-row>
     </div>
   </div>
 </template>
@@ -435,7 +436,7 @@ export default {
     }
   },
   created() {
-    let knowledge_id = window.sessionStorage.getItem("knowledge_id");
+    let knowledge_id = this.$route.query.id;
     if (knowledge_id == null) this.$router.push("/knowledge");
 
     let getParams = {};
@@ -499,5 +500,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.comment {
+  line-height: 1.6;
+  margin-bottom: 6px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+span{
+  color: #767676;
+}
 </style>

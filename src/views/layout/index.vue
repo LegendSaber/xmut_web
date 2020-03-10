@@ -29,7 +29,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .el-header {
     line-height: 60px;
     color: #333;
@@ -37,7 +37,7 @@ export default {
     font-size: 20px;
 }
 .el-main{
-  background-color: #EAEDF1;
-  background: url("../../assets/images/main.jpg");
+  height: 100%;
+  background: url("../../assets/images/main2.jpg");
 }
 </style>

@@ -17,8 +17,6 @@
           <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
             <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
             <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
-            <el-tab-pane :disabled="loading" label="收藏" name="collect"></el-tab-pane>
-            <el-tab-pane :disabled="loading" label="我的" name="my"></el-tab-pane>
           </el-tabs>
         </el-col>
         <el-col :span="1">
@@ -36,7 +34,7 @@
         </el-col>
       </el-row>
     </div>
-    <el-table
+    <!-- <el-table
       :data="tableData"
       border
       :row-class-name="tableRowClassName"
@@ -89,7 +87,33 @@
           >{{scope.row.category}}</el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </el-table> -->
+    <div style="height:140px;" v-for="(table, index) in tableData" :key="index">
+      <el-row v-loading="loading" :gutter="2">
+          <el-col style="margin-top: 40px;" :offset="1" :span="2">
+            <el-avatar shape="square" :size="60" :src="squareUrl"></el-avatar>
+          </el-col>
+          <el-col style="margin-top: 28px;" :span="16">
+            <el-row><a :href="'kndetail?id=' + table.id">{{table.title}}</a></el-row>
+            <el-row style="fontSize: 14px;color:#767676;">{{table.content.slice(0, 48)}}...</el-row>
+            <el-row>
+              <span style="fontSize: 14px;color:#3b5998;cursor: pointer;" type="primary">{{table.author}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">发表于: {{table.createTime}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <el-button style="margin-top:5px;" size="mini" type="danger">{{table.category}}</el-button>
+            </el-row>
+          </el-col>
+          <el-col :offset="1" :span="1">
+            <a :href="'kndetail?id=' + table.id"><el-button round style="margin-top: 24px;height:100px;" icon="el-icon-zoom-in" type="primary">查看</el-button></a>
+          </el-col>
+      </el-row>
+      <el-row>
+         <el-divider><i class="el-icon-s-data"></i></el-divider>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -97,6 +121,7 @@
 export default {
   data() {
     return {
+      squareUrl:"https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
       categoryName: "new",
       oldCategory: "new",
       tableData: [],
@@ -111,6 +136,12 @@ export default {
     };
   },
   methods: {
+    decryptCode(strValue) {
+      return strValue
+        .replace(/<br\s*\/?>/gi, "\r\n")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/\ \;/g, " ");
+    },
     addKnowledge(){
       this.$router.push('/addKnowledge')
     },
@@ -144,10 +175,6 @@ export default {
         this.$data.oldCategory = this.$data.categoryName;
       }
     },
-    show(id) {
-      window.sessionStorage.setItem("knowledge_id", id);
-      this.$router.push("/kndetail");
-    },
     cancelCollect(id) {
       this.$confirm("确定要取消收藏吗? ").then(_ => {
         let params = {};
@@ -159,6 +186,15 @@ export default {
             this.getInitData();
           }
         });
+      });
+    },
+    collect(id) {
+      let params = {};
+      params.id = id;
+      this.$axios.post("/sysKnowledge/collect", params).then(response => {
+        if (response && response.success) {
+          this.$notify.success(response.message)
+        }
       });
     },
     editKnowledge(id){
@@ -239,6 +275,7 @@ export default {
         this.$data.tableData = tmpData;
 
         for (let i = 0; i < length; i++) {
+          this.$data.tableData[i].content = this.decryptCode(this.$data.tableData[i].content)
           this.$data.tableData[i].createTime = this.$data.tableData[
             i
           ].createTime.slice(0, 10);
@@ -248,6 +285,7 @@ export default {
         }
       } else {
         for (let i = 0; i < length; i++) {
+          this.$data.tableData[i].content = this.decryptCode(this.$data.tableData[i].content)
           tmpData[i].createTime = tmpData[i].createTime.slice(0, 10);
           tmpData[i].modifyTime = tmpData[i].modifyTime.slice(0, 10);
           this.$data.tableData.push(tmpData[i]);
@@ -260,12 +298,6 @@ export default {
         this.$notify.error("没有更多数据");
         window.removeEventListener("scroll", this.windowScroll);
       }
-    },
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 == 0) {
-        return "warning-row";
-      }
-      return "";
     },
     windowScroll() {
       //滚动条滚动时距离顶部的距离
@@ -300,10 +332,7 @@ export default {
 };
 </script>
 
-<style>
-.el-table .warning-row {
-  background: #f0f9eb;
-}
+<style scoped>
 .el-dropdown {
   vertical-align: top;
 }
@@ -312,5 +341,21 @@ export default {
 }
 .el-icon-arrow-down {
   font-size: 12px;
+}
+a {
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #3b5998;
+    background-color: transparent;
+    font-family: PingFang SC,Verdana,Helvetica Neue,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;
+}
+
+a:hover{
+  color: #da8d28e8;
 }
 </style>
