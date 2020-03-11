@@ -16,14 +16,31 @@
     <el-button id="btn1" type="danger" plain>——村上春树 《奇鸟行状录》</el-button>
     <el-divider></el-divider>
     <o-carousel/>
+    <el-divider></el-divider>
+    <el-row>
+      <el-col :offset="4" :span="16">
+          <ve-histogram :data="chartData"></ve-histogram>
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
   
-  export default {
-    name: 'Dashbord',
-    components:{
-      
+export default {
+    data (){
+      return {
+        chartData: {
+            columns: ["日期", "新增经验贴", "新增知识贴", "新增文件数"],
+            rows: []
+        },
+      }
+    },
+    created() {
+      this.$axios.get("/sysAdmin/getChartData", {}).then(response => {
+        if (response && response.success){
+          this.$data.chartData.rows = response.data
+        }
+      })
     }
   }
 </script>

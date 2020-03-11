@@ -61,7 +61,8 @@
      <div style="height:140px;" v-for="(table, index) in tableData" :key="index">
       <el-row v-loading="loading" :gutter="2">
           <el-col style="margin-top: 40px;" :offset="1" :span="2">
-            <el-avatar shape="square" :size="60" :src="squareUrl"></el-avatar>
+            <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
+            <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
           </el-col>
           <el-col style="margin-top: 28px;" :span="16">
             <el-row><a :href="'exdetail?id=' + table.id">{{table.title}}</a></el-row>
@@ -266,6 +267,7 @@ export default {
         this.$data.tableData = [];
         return;
       }
+      
       let tmpData = data.records;
       let length = tmpData.length;
       if (!this.$data.queryData.isScroll) {

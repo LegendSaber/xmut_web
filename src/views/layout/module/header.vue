@@ -19,7 +19,10 @@
         </el-col>
         <el-col :offset="2" :span="2">
           <el-dropdown @command="handleCommand">
-            <i class="el-icon-user-solid"></i>
+            <span>
+              <i v-if="!isImg" class="el-icon-user-solid"></i>
+              <el-avatar v-else shape="square" :size="24" :src="imgUrl"></el-avatar>
+            </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="user">个人中心</el-dropdown-item>
               <el-dropdown-item command="cpassword">修改密码</el-dropdown-item>
@@ -102,6 +105,8 @@ export default {
       fullscreenLoading: false,
       activeName: "first",
       input: "",
+      imgUrl: "",
+      isImg: false,
       currentUser: {},
       dialogFormVisible: false,
       ruleForm: {
@@ -217,6 +222,13 @@ export default {
       this.$notify.error("您还没登录，请先登录");
       this.$router.push("/");
     }
+
+    this.$axios.get("/sysUsermanager/getAvatar").then(response => {
+      if (response && response.success) {
+        this.$data.imgUrl = response.data
+        this.$data.isImg = true
+      }
+    })
   }
 };
 </script>

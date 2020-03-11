@@ -7,8 +7,9 @@
             <el-col :offset="9">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
+                action="http://localhost:8888/xmut/sysUsermanager/saveAvatar"
                 :show-file-list="false"
+                :with-credentials="true"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
               >
@@ -46,8 +47,6 @@ export default {
   data() {
     return {
       currentUser: {},
-      squareUrl:
-        "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
       imageUrl: "",
       chartData: {
         columns: ["日期", "新增经验贴", "新增知识贴", "新增文件数"],
@@ -57,18 +56,20 @@ export default {
     };
   },
   methods: {
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
+    handleAvatarSuccess(response, file) {
+      window.sessionStorage.setItem('user', JSON.stringify(response.data))
+      
+      this.$data.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 0.5;
 
       if (!isJPG) {
         this.$message.error("上传头像图片只能是 JPG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error("上传头像图片大小不能超过 500kb!");
       }
 
       return isJPG && isLt2M;
@@ -82,14 +83,20 @@ export default {
         if (response && response.success) {
             window.sessionStorage.setItem('user', JSON.stringify(response.data))
             this.$data.currentUser = JSON.parse(window.sessionStorage.getItem("user"));
+            
+            this.$axios.get("/sysUsermanager/getChartData", {}).then(response => {
+                if (response && response.success) {
+                    this.$data.chartData.rows = response.data
+                }
+            })
+
+            this.$axios.get("/sysUsermanager/getAvatar", {}).then(response => {
+              if (response && response.success) {
+                this.$data.imageUrl = response.data
+              }
+            })
         }
     })   
-
-    this.$axios.get("/sysUsermanager/getChartData", {}).then(response => {
-        if (response && response.success) {
-            this.$data.chartData.rows = response.data
-        }
-    })
   }
 };
 </script>

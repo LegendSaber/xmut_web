@@ -73,7 +73,8 @@
     <div v-for="(comment, index) in commentData" :key="index">
       <el-row>
         <el-col :span="1" :offset="1">
-          <el-avatar shape="square" :size="50" :src="squareUrl"></el-avatar>
+          <el-avatar v-if="comment.img == null" shape="square" :size="50" :src="squareUrl"></el-avatar>
+          <el-avatar v-else shape="square" :size="50" :src="comment.img"></el-avatar>
         </el-col>
         <el-col :span="19" :offset="1">
           <div style="fontSize: 16px;" v-html="comment.content"></div>
@@ -273,13 +274,14 @@ export default {
       params.flag = this.$data.queryComment.flag;
 
       this.$axios
-        .post("/sysComment/getKnowledgeComment", params)
+        .get("/sysComment/getKnowledgeComment", params)
         .then(response => {
           if (response && response.success) {
             if (response.data == null) {
               window.removeEventListener("scroll", this.windowScroll);
               return;
             }
+            
             if (!this.$data.queryComment.isScroll) {
               this.$data.commentData = response.data.records;
               let len = this.$data.commentData.length;

@@ -14,7 +14,7 @@
       :on-error="handleAvatarError"
     >
       <el-button :disabled="loading" icon="el-icon-upload" size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传zip文件，且不超过50M</div>
+      <div slot="tip" class="el-upload__tip">只能上传zip文件，且不超过500kb</div>
     </el-upload>
     <el-divider />
     <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
@@ -110,8 +110,8 @@ export default {
       }
 
       //校验文件大小
-      if (file.size / 1024 / 1024 > 50) {
-        this.$message.error("上传的文件不可以超过50M");
+      if (file.size / 1024 / 1024 > 0.5) {
+        this.$message.error("上传的文件不可以超过500kb");
         this.$data.loading = false;
         return false;
       }

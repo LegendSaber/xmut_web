@@ -1,8 +1,10 @@
 <template>
     <div>
         <el-row>
-            <el-button v-if="!isSign" @click="sign" id="signBtn" type="danger" plain circle>签到</el-button>
-            <el-button v-else id="signBtn" type="warning" circle plain>今日已签到</el-button>
+            <el-col :offset="8" :span="6">
+                <el-button v-if="!isSign" @click="sign" id="signBtn" type="danger" plain circle>签到</el-button>
+                <el-button v-else id="signBtn" type="warning" circle plain>今日已签到</el-button>
+            </el-col>
         </el-row>
         <el-calendar v-model="value">
         </el-calendar>
@@ -50,7 +52,6 @@ export default {
 #signBtn {
     width: 280px;
     height: 180px;
-    margin-left: 300px; 
     font-size: 25px;
 }
 </style>

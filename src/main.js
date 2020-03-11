@@ -8,6 +8,7 @@ import http from './utils/http'
 import components from './components/components.js'
 import '@/assets/css/global.css'
 import VeLine from 'v-charts/lib/line.common'
+import VeHistogram from 'v-charts/lib/histogram.common'
 
 Vue.prototype.$axios = http
 
@@ -19,6 +20,7 @@ Vue.use(ElementUI, {
     zIndex: 3000
 })
 Vue.component(VeLine.name, VeLine)
+Vue.component(VeHistogram.name, VeHistogram)
 
 /* eslint-disable no-new */
 new Vue({

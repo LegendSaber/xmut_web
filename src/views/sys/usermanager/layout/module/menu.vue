@@ -15,7 +15,7 @@
         <i class="el-icon-message-solid"></i>
         <span slot="title">我的签到</span>
       </el-menu-item>
-      <el-menu-item v-if="isMaster" index="5">
+      <el-menu-item index="5">
         <i class="el-icon-user-solid"></i>
         <span slot="title">我的资料</span>
       </el-menu-item>
