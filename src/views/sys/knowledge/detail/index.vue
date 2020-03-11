@@ -12,21 +12,24 @@
     </div>
     <el-divider />
     <div v-html="essay.content" style="fontSize:20px;"></div>
-    <div v-if="images.length > 0">
+    <el-row v-if="images.length > 0">
       <el-divider />
-      <img
-        v-for="(image, index) in images"
-        :alt="image.name"
-        :key="index"
-        :src="image.img"
-        width="304"
-        height="228"
-        @click="showImg(index)"
-      />
-      <el-dialog :visible.sync="bigImg.dialogVisible">
-        <img width="100%" :src="bigImg.dialogImageUrl" alt />
-      </el-dialog>
-    </div>
+      <el-col>
+        <img
+          v-for="(image, index) in images"
+          :alt="image.name"
+          :key="index"
+          :src="image.img"
+          width="304"
+          height="228"
+          style="margin-left: 24px;"
+          @click="showImg(index)"
+        />
+        <el-dialog :visible.sync="bigImg.dialogVisible">
+          <img width="100%" :src="bigImg.dialogImageUrl" alt />
+        </el-dialog>
+      </el-col>
+    </el-row>
     <el-divider />
     <el-button v-if="!isCollect" @click="collect" type="primary" icon="el-icon-star-off" plain>点击收藏</el-button>
     <el-button v-else @click="cancelCollect" type="warning" icon="el-icon-star-on">已收藏</el-button>
@@ -94,7 +97,9 @@
       <div v-for="(son, index) in comment.sonComment" :key="index">
         <el-row>
           <el-col :offset="3">
-            <el-divider><i class="el-icon-s-comment"></i></el-divider>
+            <el-divider>
+              <i class="el-icon-s-comment"></i>
+            </el-divider>
           </el-col>
         </el-row>
         <el-row>
@@ -113,7 +118,9 @@
         </el-row>
       </div>
       <el-row>
-        <el-divider><i class="el-icon-s-data"></i></el-divider>
+        <el-divider>
+          <i class="el-icon-s-data"></i>
+        </el-divider>
       </el-row>
     </div>
   </div>
@@ -281,7 +288,7 @@ export default {
               window.removeEventListener("scroll", this.windowScroll);
               return;
             }
-            
+
             if (!this.$data.queryComment.isScroll) {
               this.$data.commentData = response.data.records;
               let len = this.$data.commentData.length;
@@ -448,7 +455,10 @@ export default {
       .then(response => {
         if (response && response.success) {
           this.$data.essay = response.data;
-          this.$data.essay.createTime = this.$data.essay.createTime.slice(0, 10)
+          this.$data.essay.createTime = this.$data.essay.createTime.slice(
+            0,
+            10
+          );
 
           let params = {};
           params.id = this.$data.essay.id;
@@ -509,7 +519,16 @@ export default {
   font-size: 14px;
   margin-top: 8px;
 }
-span{
+span {
   color: #767676;
+}
+
+img {
+  margin: 5px;
+  border: 1px solid #ccc;
+}
+
+img:hover {
+  border: 1px solid #777;
 }
 </style>

@@ -5,15 +5,19 @@
       :rules="rules"
       ref="ruleForm"
       label-width="100px"
-      class="demo-ruleForm"
+      class="elegant-aero"
     >
-      <el-form-item label="标题" prop="title">
-        <el-input :autosize="{maxRows: 1}" v-model="ruleForm.title"></el-input>
+      <h1>
+        分享知识
+        <span>请输入以下内容</span>
+      </h1>
+      <el-form-item style="margin-left: 60px;" label="标题" prop="title">
+        <el-input style="width: 40%;" :autosize="{maxRows: 1}" v-model="ruleForm.title"></el-input>
       </el-form-item>
-      <el-form-item label="内容" prop="content">
-        <el-input :autosize="{minRows:30,maxRows: 30}" type="textarea" v-model="ruleForm.content"></el-input>
+      <el-form-item style="margin-left: 60px;" label="内容" prop="content">
+        <el-input style="width: 80%;" :autosize="{minRows:30,maxRows: 30}" type="textarea" v-model="ruleForm.content"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-left: 60px;">
         <div>
           <el-upload
             action="http://localhost:8888/xmut/sysKnowledge/upload"
@@ -33,7 +37,7 @@
           </el-dialog>
         </div>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-left: 60px;padding-bottom: 30px;">
         <div class="demo-drawer__footer">
           <el-select v-model="ruleForm.value" placeholder="请选择类别">
             <el-option
@@ -208,26 +212,24 @@ export default {
       this.$axios.post("/sysFile/deletePicture", params).then(response => {});
     }
   },
-  beforeDestory() {
-    if (window.sessionStorage.getItem("editKnowledge_id")) window.sessionStorage.removeItem("editKnowledge_id");
-  },
   created() {
-    let id = window.sessionStorage.getItem("editKnowledge_id");
-    if (id != null) {
-      this.$data.id = id
+    if (this.$route.query.id != -1) {
+      let currentUser = JSON.parse(window.sessionStorage.getItem("user"));
+      this.$data.id = this.$route.query.id;
       let getParams = {};
-      getParams.id = id;
+      getParams.id = this.$data.id;
       this.$axios
         .get("/sysKnowledge/getKnowledgeById", getParams)
         .then(response => {
           if (response && response.success) {
             let data = response.data;
+            if (data.author != currentUser.username) this.$router.push("/knowledge")
             this.$data.ruleForm.title = data.title;
             this.$data.ruleForm.content = this.decryptCode(data.content);
             this.$data.ruleForm.value = data.category;
             let params = {};
 
-            params.id = id;
+            params.id = this.$data.id;
             this.$axios.get("/sysFile/loadPicture", params).then(response => {
               if (response && response.success) {
                 let data = response.data;
@@ -251,5 +253,22 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.elegant-aero {
+  background: #d2e9ff;
+  font: 12px Arial, Helvetica, sans-serif;
+  color: #666;
+  margin: -40px -30px -40px -30px;
+}
+.elegant-aero h1 {
+  font: 24px "Trebuchet MS", Arial, Helvetica, sans-serif;
+  padding: 10px 10px 10px 60px;
+  display: block;
+  background: #c0e1ff;
+  border-bottom: 1px solid #b8ddff;
+}
+.elegant-aero h1 > span {
+  display: block;
+  font-size: 11px;
+}
 </style>

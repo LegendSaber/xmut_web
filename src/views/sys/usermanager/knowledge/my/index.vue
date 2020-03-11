@@ -33,7 +33,7 @@
                 <a :href="'kndetail?id=' + scope.row.id"><el-button type="primary" icon="el-icon-zoom-in"></el-button></a>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="编辑" placement="right-start" :enterable="false">
-                <a :href="'kndetail?id=' + scope.row.id"><el-button type="warning" icon="el-icon-setting"></el-button></a>
+                    <a :href="'addKnowledge?id=' + scope.row.id"><el-button type="warning" icon="el-icon-setting"></el-button></a>
                 </el-tooltip>
                 <el-button @click="deleteKnowledge(scope.row.id)" type="danger" icon="el-icon-delete"></el-button>
             </template>

@@ -195,6 +195,15 @@ export default new Router({
                 component: () =>
                     import ("../views/sys/search/index")
             }]
+        },
+        {
+            path: '/addexperience',
+            component: layout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/experience/add/index")
+            }]
         }
     ]
 })

@@ -94,7 +94,7 @@
     </div>
     <br />
     <br />
-    <el-button icon="el-icon-document-copy" type="success">知识贴如下:</el-button>
+    <el-button icon="el-icon-document-copy" type="success">文件帖如下:</el-button>
     <el-divider>
       <i class="el-icon-s-grid"></i>
     </el-divider>

@@ -4,55 +4,12 @@
     <el-divider />
     <el-tag style="margin-left:200px;fontSize: 28px" type="danger" plain>青春是一个短暂的美梦, 当你醒来时, 它早已消失无踪</el-tag>
     <el-divider />
-    <el-button
-      @click="addExperience"
+    <a href="addexperience?id=-1"><el-button
       type="primary"
       style="margin-bottom: 5px"
       icon="el-icon-circle-plus"
       :loading="loading"
-    >发表经验</el-button>
-
-    <el-drawer
-      title="编辑文章"
-      :before-close="handleClose"
-      :visible.sync="dialog"
-      direction="rtl"
-      custom-class="demo-drawer"
-      ref="drawer"
-      size="50%"
-    >
-      <div class="demo-drawer__content">
-        <el-form
-          :model="ruleForm"
-          :rules="rules"
-          ref="ruleForm"
-          label-width="100px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="标题" prop="title">
-            <el-input :autosize="{maxRows: 1}" v-model="ruleForm.title"></el-input>
-          </el-form-item>
-          <el-form-item label="内容" prop="content">
-            <el-input
-              :autosize="{minRows:30,maxRows: 40}"
-              type="textarea"
-              v-model="ruleForm.content"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class="demo-drawer__footer">
-              <el-button
-                :loading="dwloading"
-                type="primary"
-                @click="submitForm('ruleForm')"
-              >{{ dwloading ? '提交中 ...' : '提交' }}</el-button>
-              <el-button type="warning" @click="resetForm('ruleForm')" plain>重置</el-button>
-              <el-button @click="cancelForm" type="danger" plain>取 消</el-button>
-            </div>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-drawer>
+    >发表经验</el-button></a>
 
     <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
       <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
@@ -100,128 +57,9 @@ export default {
         currentPage: 0,
         pageSize: 12
       },
-      dialog: false,
-      dwloading: false,
-      ruleForm: {
-        title: "",
-        content: "",
-        essayId: -1
-      },
-      rules: {
-        title: [
-          { required: true, message: "请输入标题", trigger: "blur" },
-          {
-            min: 3,
-            max: 40,
-            message: "长度在 3 到 40 个字符",
-            trigger: "blur"
-          }
-        ],
-        content: [
-          { required: true, message: "请填写内容", trigger: "blur" },
-          {
-            min: 10,
-            max: 2000,
-            message: "长度在 10 到 2000 个字符",
-            trigger: "blur"
-          }
-        ]
-      }
     };
   },
   methods: {
-    getFormatCode(strValue) {
-      return strValue
-        .replace(/\r\n/g, "<br/>")
-        .replace(/\n/g, "<br/>")
-        .replace(/\s/g, " ");
-    },
-    decryptCode(strValue) {
-      return strValue
-        .replace(/<br\s*\/?>/gi, "\r\n")
-        .replace(/<br\s*\/?>/gi, "\n")
-        .replace(/\ \;/g, " ");
-    },
-    addExperience() {
-      this.$data.ruleForm.essayId = -1;
-      this.$data.dialog = true;
-    },
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          let params = {};
-          this.$data.dwloading = true;
-          params.title = this.$data.ruleForm.title;
-          if (this.$data.ruleForm.content != null)
-            params.content = this.getFormatCode(this.$data.ruleForm.content);
-          else params.content = this.$data.ruleForm.content;
-          if (this.$data.ruleForm.essayId == -1) {
-            setTimeout(() => {
-              this.$axios
-                .post("/sysExperience/insert", params)
-                .then(response => {
-                  if (response && response.success) {
-                    this.$alert(response.message, "提交结果", {
-                      confirmButtonText: "确定",
-                      callback: action => {
-                        this.$data.dwloading = false;
-                        this.$data.dialog = false;
-                        this.resetForm("ruleForm");
-                        this.getInitData()
-                      }
-                    });
-                  } else {
-                    this.$notify.error(response.message);
-                    this.$data.dwloading = false;
-                  }
-                });
-            }, 2000);
-          } else {
-            params.id = this.$data.ruleForm.essayId;
-            setTimeout(() => {
-              this.$axios
-                .post("/sysExperience/modifyExperience", params)
-                .then(response => {
-                  if (response && response.success) {
-                    this.$alert(response.message, "提交结果", {
-                      confirmButtonText: "确定",
-                      callback: action => {
-                        this.$data.dwloading = false;
-                        this.$data.dialog = false;
-                        this.resetForm("ruleForm");
-                        this.getInitData()
-                      }
-                    });
-                  }
-                });
-            }, 2000);
-          }
-        } else {
-          this.$alert("表单信息填写有误，请修改!", "提交结果", {
-            confirmButtonText: "确定",
-            callback: action => {}
-          });
-          return false;
-        }
-      });
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
-    handleClose(done) {
-      if (this.$data.dwloading) {
-        return;
-      }
-      this.$confirm("确定要关闭表单吗？").then(_ => {
-        this.resetForm("ruleForm");
-        done();
-      });
-    },
-    cancelForm() {
-      this.resetForm("ruleForm");
-      this.$data.dwloading = false;
-      this.$data.dialog = false;
-    },
     categoryHandle() {
       if (this.$data.oldCategory != this.$data.categoryName) {
         if (this.$data.categoryName === "new") {
@@ -295,12 +133,6 @@ export default {
         this.$notify.error("没有更多数据");
         window.removeEventListener("scroll", this.windowScroll);
       }
-    },
-    editExperience(row) {
-      this.$data.ruleForm.essayId = row.id;
-      this.$data.ruleForm.title = row.title;
-      this.$data.ruleForm.content = this.decryptCode(row.content);
-      this.$data.dialog = true;
     },
     windowScroll() {
       //滚动条滚动时距离顶部的距离

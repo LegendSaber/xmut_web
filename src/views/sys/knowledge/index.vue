@@ -4,13 +4,13 @@
     <el-divider />
     <el-tag style="margin-left:200px;fontSize: 28px" type="success" plain>时代不同，空气不同，人的想法也随之不同。</el-tag>
     <el-divider />
-    <el-button
+    <a href="addKnowledge?id=-1"><el-button
       @click="addKnowledge"
       type="primary"
       style="margin-bottom: 5px"
       icon="el-icon-circle-plus"
       :loading="loading"
-    >分享知识</el-button>
+    >分享知识</el-button></a>
     <div>
       <el-row>
         <el-col :span="21">
@@ -117,10 +117,6 @@ export default {
         this.getInitData();
         this.$data.oldCategory = this.$data.categoryName;
       }
-    },
-    editKnowledge(id){
-      window.sessionStorage.setItem("editKnowledge_id", id);
-      this.$router.push("/addKnowledge");
     },
     getInitData() {
       this.$data.queryData.currentPage = 0;
