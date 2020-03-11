@@ -15,7 +15,7 @@
           <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="input" />
         </el-col>
         <el-col :span="1">
-          <el-button type="primary" icon="el-icon-search">搜索</el-button>
+          <a :href="'search?value=' + input"><el-button type="primary" icon="el-icon-search">搜索</el-button></a>
         </el-col>
         <el-col :offset="2" :span="2">
           <el-dropdown @command="handleCommand">

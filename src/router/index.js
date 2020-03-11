@@ -186,6 +186,15 @@ export default new Router({
                 component: () =>
                     import ("../views/sys/usermanager/my/sign/index")
             }]
+        },
+        {
+            path: '/search',
+            component: layout,
+            children: [{
+                path: '/',
+                component: () =>
+                    import ("../views/sys/search/index")
+            }]
         }
     ]
 })

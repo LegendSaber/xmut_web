@@ -20,53 +20,34 @@
     <el-tabs v-model="categoryName" type="card" @tab-click="categoryHandle">
       <el-tab-pane :disabled="loading" label="最新" name="new"></el-tab-pane>
       <el-tab-pane :disabled="loading" label="热门" name="hot"></el-tab-pane>
-      <el-tab-pane :disabled="loading" label="收藏" name="collect"></el-tab-pane>
-      <el-tab-pane :disabled="loading" label="我的" name="my"></el-tab-pane>
     </el-tabs>
-    <el-table
-      :data="tableData"
-      border
-      :row-class-name="tableRowClassName"
-      style="width: 100%;fontSize:18px"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-    >
-      <el-table-column min-width="130" prop="createTime" label="日期"></el-table-column>
-      <el-table-column min-width="130" prop="author" label="作者"></el-table-column>
-      <el-table-column min-width="280" prop="fileName" label="文件名"></el-table-column>
-      <el-table-column min-width="280" label="操作">
-        <template slot-scope="scope">
-          <el-button @click="download(scope.row.id)" icon="el-icon-download" type="primary" plain>下载</el-button>
-          <el-button
-            v-if="queryData.flag == 1"
-            icon="el-icon-folder-add"
-            @click="collect(scope.row.id)"
-            type="warning"
-            plain
-          >收藏</el-button>
-          <el-button
-            v-if="queryData.flag == 2"
-            icon="el-icon-user"
-            type="warning"
-            plain
-          >收藏人数:{{scope.row.favorNum}}</el-button>
-          <el-button
-            v-if="queryData.flag == 3"
-            icon="el-icon-star-on"
-            @click="cancelCollect(scope.row.id)"
-            type="warning"
-            plain
-          >已收藏</el-button>
-          <el-button
-            v-if="queryData.flag == 4"
-            icon="el-icon-delete"
-            type="danger"
-            @click="deleteFile(scope.row.id)"
-            plain
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div style="height:120px;" v-for="(table, index) in tableData" :key="index">
+      <el-row v-loading="loading" :gutter="2">
+          <el-col style="margin-top: 40px;" :offset="1" :span="2">
+            <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
+            <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
+          </el-col>
+          <el-col style="margin-top: 32px;" :span="16">
+            <el-row><a @click="download(table.id)">{{table.fileName}}</a></el-row>
+            <el-row style="margin-top:8px;">
+              <span style="fontSize: 14px;color:#3b5998;cursor: pointer;" type="primary">{{table.author}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">于{{table.createTime}}上传</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
+            </el-row>
+          </el-col>
+          <el-col :offset="1" :span="1">
+            <el-button @click="download(table.id)" round style="margin-top: 24px;height:80px;" icon="el-icon-download" type="primary">下载</el-button>
+          </el-col>
+          <el-col :offset="1" :span="1">
+            <el-button @click="collect(table.id)" round style="margin-top: 24px;height:80px;" icon="el-icon-folder-add" type="warning">收藏</el-button>
+          </el-col>
+      </el-row>
+      <el-row>
+         <el-divider><i class="el-icon-s-data"></i></el-divider>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -139,11 +120,7 @@ export default {
           this.$data.queryData.flag = 1;
         } else if (this.$data.categoryName === "hot") {
           this.$data.queryData.flag = 2;
-        } else if (this.$data.categoryName === "collect") {
-          this.$data.queryData.flag = 3;
-        } else {
-          this.$data.queryData.flag = 4;
-        }
+        } 
         this.getInitData();
         this.$data.oldCategory = this.$data.categoryName;
       }
@@ -152,26 +129,13 @@ export default {
       let params = {};
       params.currentPage = this.$data.queryData.currentPage;
       params.pageSize = this.$data.queryData.pageSize;
-      if (this.$data.queryData.flag == 1 || this.$data.queryData.flag == 2) {
+      
         params.flag = this.$data.queryData.flag;
-        this.$axios.post("/sysFile/getAll", params).then(response => {
+        this.$axios.get("/sysFile/getAll", params).then(response => {
           if (response && response.success) {
             this.setData(response.data);
           }
         });
-      } else if (this.$data.queryData.flag == 3) {
-        this.$axios.post("/sysFile/getMyCollect", params).then(response => {
-          if (response && response.success) {
-            this.setData(response.data);
-          }
-        });
-      } else {
-        this.$axios.post("/sysFile/getMyFile", params).then(response => {
-          if (response && response.success) {
-            this.setData(response.data);
-          }
-        });
-      }
     },
     setData(data) {
       if (data == null) {
@@ -202,12 +166,6 @@ export default {
         window.removeEventListener("scroll", this.windowScroll);
       }
     },
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 == 0) {
-        return "warning-row";
-      }
-      return "";
-    },
     download(id) {
       window.open("http://localhost:8888/xmut/sysFile/download?id=" + id)
     },
@@ -221,41 +179,6 @@ export default {
         } else {
           this.$notify.error(response.message);
         }
-      });
-    },
-    cancelCollect(id) {
-      this.$confirm("确定要取消收藏吗? ").then(_ => {
-        let params = {};
-        params.id = id;
-
-        this.$axios.post("/sysFile/cancelCollect", params).then(response => {
-          if (response && response.success) {
-            this.$notify.success(response.message);
-            this.getInitData();
-          }
-        });
-      });
-    },
-    deleteFile(id) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        center: true
-      }).then(() => {
-        let params = {};
-
-        params.id = id;
-        this.$axios.post("sysFile/delete", params).then(response => {
-          if (response && response.success) {
-            this.$alert(response.message, "删除结果", {
-              confirmButtonText: "确定",
-              callback: action => {
-                this.getInitData();
-              }
-            });
-          }
-        });
       });
     },
     windowScroll() {
@@ -291,8 +214,21 @@ export default {
 };
 </script>
 
-<style>
-.el-table .warning-row {
-  background: #f0f9eb;
+<style scoped>
+a {
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #3b5998;
+    background-color: transparent;
+    font-family: PingFang SC,Verdana,Helvetica Neue,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,sans-serif;
+}
+
+a:hover{
+  color: #da8d28e8;
 }
 </style>

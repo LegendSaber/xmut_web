@@ -461,7 +461,7 @@ export default {
           });
 
           this.$axios
-            .post("/sysKnowledge/isMyKnowledge", params)
+            .get("/sysKnowledge/isMyKnowledge", params)
             .then(response => {
               if (response && response.success) {
                 this.$data.isMy = true;
@@ -474,7 +474,7 @@ export default {
             this.$data.queryComment.pageSize / 2 + 1;
           this.$data.queryComment.pageSize = 2;
 
-          this.$axios.post("/sysFile/loadPicture", params).then(response => {
+          this.$axios.get("/sysFile/loadPicture", params).then(response => {
             if (response && response.success) {
               let data = response.data;
               let length = data.length;
