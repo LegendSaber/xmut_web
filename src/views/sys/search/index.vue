@@ -1,113 +1,145 @@
 <template>
   <div>
-    <el-button icon="el-icon-s-flag" type="primary">经验贴如下:</el-button>
+    <o-carousel />
     <el-divider>
-      <i class="el-icon-s-grid"></i>
+      <i class="el-icon-s-opportunity"></i>
     </el-divider>
-    <div style="height:140px;" v-for="(table, index) in experienceList" :key="index">
-      <el-row :gutter="2">
-        <el-col style="margin-top: 40px;" :offset="1" :span="2">
-          <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
-          <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
-        </el-col>
-        <el-col style="margin-top: 28px;" :span="16">
-          <el-row>
-            <a :href="'exdetail?id=' + table.id">{{table.title}}</a>
-          </el-row>
-          <el-row
-            style="margin-top:5px;fontSize: 14px;color:#767676;"
-          >{{table.content.slice(0, 48)}}...</el-row>
-          <el-row style="margin-top:5px;">
-            <span
-              style="fontSize: 14px;color:#3b5998;cursor: pointer;"
-              type="primary"
-            >{{table.author}}</span>
-            <el-divider direction="vertical"></el-divider>
-            <span style="fontSize: 14px;color: #767676;">发表于: {{table.createTime}}</span>
-            <el-divider direction="vertical"></el-divider>
-            <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
-          </el-row>
-        </el-col>
-        <el-col :offset="1" :span="1">
-          <a :href="'exdetail?id=' + table.id">
-            <el-button
-              round
-              style="margin-top: 24px;height:100px;"
-              icon="el-icon-zoom-in"
-              type="primary"
-            >查看</el-button>
-          </a>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-divider>
-          <i class="el-icon-s-data"></i>
-        </el-divider>
-      </el-row>
+    <el-row :gutter="4">
+      <el-col :span="22">
+        <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="search" clearable></el-input>
+      </el-col>
+      <el-col :span="2">
+        <el-button type="info" icon="el-icon-search" @click="getData">搜索</el-button>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-radio-group v-model="radio">
+        <el-radio :label="3">经验贴</el-radio>
+        <el-radio :label="6">知识贴</el-radio>
+        <el-radio :label="9">文件贴</el-radio>
+      </el-radio-group>
+    </el-row>
+    <el-divider>
+      <i class="el-icon-s-promotion"></i>
+    </el-divider>
+    <div v-if="show == 3">
+      <el-button icon="el-icon-s-flag" type="primary">经验贴如下:</el-button>
+      <el-divider>
+        <i class="el-icon-s-grid"></i>
+      </el-divider>
+      <div style="height:140px;" v-for="(table, index) in experienceList" :key="index">
+        <el-row :gutter="2">
+          <el-col style="margin-top: 40px;" :offset="1" :span="2">
+            <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
+            <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
+          </el-col>
+          <el-col style="margin-top: 28px;" :span="16">
+            <el-row>
+              <a :href="'exdetail?id=' + table.id">{{table.title}}</a>
+            </el-row>
+            <el-row
+              style="margin-top:5px;fontSize: 14px;color:#767676;"
+            >{{table.content.slice(0, 48)}}...</el-row>
+            <el-row style="margin-top:5px;">
+              <span
+                style="fontSize: 14px;color:#3b5998;cursor: pointer;"
+                type="primary"
+              >{{table.author}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">发表于: {{table.createTime}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
+            </el-row>
+          </el-col>
+          <el-col :offset="1" :span="1">
+            <a :href="'exdetail?id=' + table.id">
+              <el-button
+                round
+                style="margin-top: 24px;height:100px;"
+                icon="el-icon-zoom-in"
+                type="primary"
+              >查看</el-button>
+            </a>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-divider>
+            <i class="el-icon-s-data"></i>
+          </el-divider>
+        </el-row>
+      </div>
+      <br />
+      <br />
     </div>
-    <br />
-    <br />
-    <el-button icon="el-icon-s-promotion" type="warning">知识贴如下:</el-button>
-    <el-divider>
-      <i class="el-icon-s-grid"></i>
-    </el-divider>
-    <div style="height:140px;" v-for="(table, index) in knowledgeList" :key="index">
-      <el-row :gutter="2">
-        <el-col style="margin-top: 40px;" :offset="1" :span="2">
-          <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
-          <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
-        </el-col>
-        <el-col style="margin-top: 28px;" :span="16">
-          <el-row>
-            <a :href="'kndetail?id=' + table.id">{{table.title}}</a>
-          </el-row>
-          <el-row style="fontSize: 14px;color:#767676;">{{table.content.slice(0, 48)}}...</el-row>
-          <el-row>
-            <span
-              style="fontSize: 14px;color:#3b5998;cursor: pointer;"
-              type="primary"
-            >{{table.author}}</span>
-            <el-divider direction="vertical"></el-divider>
-            <span style="fontSize: 14px;color: #767676;">发表于: {{table.createTime}}</span>
-            <el-divider direction="vertical"></el-divider>
-            <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
-            <el-divider direction="vertical"></el-divider>
-            <el-button style="margin-top:5px;" size="mini" type="danger">{{table.category}}</el-button>
-          </el-row>
-        </el-col>
-        <el-col :offset="1" :span="1">
-          <a :href="'kndetail?id=' + table.id">
-            <el-button
-              round
-              style="margin-top: 24px;height:100px;"
-              icon="el-icon-zoom-in"
-              type="primary"
-            >查看</el-button>
-          </a>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-divider>
-          <i class="el-icon-s-data"></i>
-        </el-divider>
-      </el-row>
+    <div v-if="show == 6">
+      <el-button icon="el-icon-s-promotion" type="warning">知识贴如下:</el-button>
+      <el-divider>
+        <i class="el-icon-s-grid"></i>
+      </el-divider>
+      <div style="height:140px;" v-for="(table, index) in knowledgeList" :key="index">
+        <el-row :gutter="2">
+          <el-col style="margin-top: 40px;" :offset="1" :span="2">
+            <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
+            <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
+          </el-col>
+          <el-col style="margin-top: 28px;" :span="16">
+            <el-row>
+              <a :href="'kndetail?id=' + table.id">{{table.title}}</a>
+            </el-row>
+            <el-row style="fontSize: 14px;color:#767676;">{{table.content.slice(0, 48)}}...</el-row>
+            <el-row>
+              <span
+                style="fontSize: 14px;color:#3b5998;cursor: pointer;"
+                type="primary"
+              >{{table.author}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">发表于: {{table.createTime}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="fontSize: 14px;color: #767676;">收藏人数: {{table.favorNum}}</span>
+              <el-divider direction="vertical"></el-divider>
+              <el-button style="margin-top:5px;" size="mini" type="danger">{{table.category}}</el-button>
+            </el-row>
+          </el-col>
+          <el-col :offset="1" :span="1">
+            <a :href="'kndetail?id=' + table.id">
+              <el-button
+                round
+                style="margin-top: 24px;height:100px;"
+                icon="el-icon-zoom-in"
+                type="primary"
+              >查看</el-button>
+            </a>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-divider>
+            <i class="el-icon-s-data"></i>
+          </el-divider>
+        </el-row>
+      </div>
+      <br />
+      <br />
     </div>
-    <br />
-    <br />
-    <el-button icon="el-icon-document-copy" type="success">文件帖如下:</el-button>
-    <el-divider>
-      <i class="el-icon-s-grid"></i>
-    </el-divider>
-    <div style="height:120px;" v-for="(table, index) in fileList" :key="index">
-      <el-row v-loading="loading" :gutter="2">
+    <div v-if="show == 9">
+      <el-button icon="el-icon-document-copy" type="success">文件帖如下:</el-button>
+      <el-divider>
+        <i class="el-icon-s-grid"></i>
+      </el-divider>
+      <div style="height:120px;" v-for="(table, index) in fileList" :key="index">
+        <el-row :gutter="2">
           <el-col style="margin-top: 40px;" :offset="1" :span="2">
             <el-avatar v-if="table.img == null" shape="square" :size="60" :src="squareUrl"></el-avatar>
             <el-avatar v-else shape="square" :size="60" :src="table.img"></el-avatar>
           </el-col>
           <el-col style="margin-top: 32px;" :span="16">
-            <el-row><a @click="download(table.id)">{{table.fileName}}</a></el-row>
+            <el-row>
+              <a @click="download(table.id)">{{table.fileName}}</a>
+            </el-row>
             <el-row style="margin-top:8px;">
-              <span style="fontSize: 14px;color:#3b5998;cursor: pointer;" type="primary">{{table.author}}</span>
+              <span
+                style="fontSize: 14px;color:#3b5998;cursor: pointer;"
+                type="primary"
+              >{{table.author}}</span>
               <el-divider direction="vertical"></el-divider>
               <span style="fontSize: 14px;color: #767676;">于{{table.createTime}}上传</span>
               <el-divider direction="vertical"></el-divider>
@@ -115,15 +147,30 @@
             </el-row>
           </el-col>
           <el-col :offset="1" :span="1">
-            <el-button @click="download(table.id)" round style="margin-top: 24px;height:80px;" icon="el-icon-download" type="primary">下载</el-button>
+            <el-button
+              @click="download(table.id)"
+              round
+              style="margin-top: 24px;height:80px;"
+              icon="el-icon-download"
+              type="primary"
+            >下载</el-button>
           </el-col>
           <el-col :offset="1" :span="1">
-            <el-button @click="collect(table.id)" round style="margin-top: 24px;height:80px;" icon="el-icon-folder-add" type="warning">收藏</el-button>
+            <el-button
+              @click="collect(table.id)"
+              round
+              style="margin-top: 24px;height:80px;"
+              icon="el-icon-folder-add"
+              type="warning"
+            >收藏</el-button>
           </el-col>
-      </el-row>
-      <el-row>
-         <el-divider><i class="el-icon-s-data"></i></el-divider>
-      </el-row>
+        </el-row>
+        <el-row>
+          <el-divider>
+            <i class="el-icon-s-data"></i>
+          </el-divider>
+        </el-row>
+      </div>
     </div>
   </div>
 </template>
@@ -136,13 +183,16 @@ export default {
         "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
       experienceList: [],
       knowledgeList: [],
-      fileList: []
+      fileList: [],
+      radio: 3,
+      show: 3,
+      search: ""
     };
   },
   created() {
     if (this.$route.query.value == "") {
-        this.$notify.error("请输入搜索内容")
-        this.$router.push("/dashbord")
+      this.$notify.error("请输入搜索内容");
+      this.$router.push("/dashbord");
     }
     let params = {};
     params.value = this.$route.query.value;
@@ -160,36 +210,10 @@ export default {
           }
         }
       });
-    this.$axios
-      .get("/sysKnowledge/getSearchKnowledge", params)
-      .then(response => {
-        if (response && response.success && response.data != null) {
-          this.$data.knowledgeList = response.data;
-          let len = this.$data.knowledgeList.length;
-
-          for (let i = 0; i < len; i++) {
-            this.$data.knowledgeList[i].createTime = this.$data.knowledgeList[
-              i
-            ].createTime.slice(0, 10);
-          }
-        }
-      });
-    this.$axios.get("/sysFile/getSearchFile", params).then(response => {
-      if (response && response.success && response.data != null) {
-        this.$data.fileList = response.data;
-        let len = this.$data.fileList.length;
-
-        for (let i = 0; i < len; i++) {
-          this.$data.fileList[i].createTime = this.$data.fileList[
-            i
-          ].createTime.slice(0, 10);
-        }
-      }
-    });
   },
-  methods:{
+  methods: {
     download(id) {
-      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id)
+      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id);
     },
     collect(id) {
       let params = {};
@@ -203,6 +227,74 @@ export default {
         }
       });
     },
+    getExperienceList() {
+      let params = {};
+      params.value = this.$data.search;
+
+      this.$axios
+        .get("/sysExperience/getSearchExperience", params)
+        .then(response => {
+          if (response && response.success && response.data != null) {
+            this.$data.experienceList = response.data;
+            let len = this.$data.experienceList.length;
+
+            for (let i = 0; i < len; i++) {
+              this.$data.experienceList[
+                i
+              ].createTime = this.$data.experienceList[i].createTime.slice(
+                0,
+                10
+              );
+            }
+          }
+        });
+    },
+    getKnowledgeList() {
+      let params = {};
+      params.value = this.$data.search;
+
+      this.$axios
+        .get("/sysKnowledge/getSearchKnowledge", params)
+        .then(response => {
+          if (response && response.success && response.data != null) {
+            this.$data.knowledgeList = response.data;
+            let len = this.$data.knowledgeList.length;
+
+            for (let i = 0; i < len; i++) {
+              this.$data.knowledgeList[i].createTime = this.$data.knowledgeList[
+                i
+              ].createTime.slice(0, 10);
+            }
+          }
+        });
+    },
+    getFileList() {
+      let params = {};
+      params.value = this.$data.search;
+
+      this.$axios.get("/sysFile/getSearchFile", params).then(response => {
+        if (response && response.success && response.data != null) {
+          this.$data.fileList = response.data;
+          let len = this.$data.fileList.length;
+
+          for (let i = 0; i < len; i++) {
+            this.$data.fileList[i].createTime = this.$data.fileList[
+              i
+            ].createTime.slice(0, 10);
+          }
+        }
+      });
+    },
+    getData() {
+      if (this.$data.radio == 3) {
+        this.getExperienceList();
+      } else if (this.$data.radio == 6) {
+        this.getKnowledgeList();
+      } else {
+        this.getFileList();
+      }
+      this.$data.show = this.$data.radio;
+    }
   }
 };
 </script>
