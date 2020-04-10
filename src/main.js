@@ -9,11 +9,12 @@ import components from './components/components.js'
 import '@/assets/css/global.css'
 import VeLine from 'v-charts/lib/line.common'
 import VeHistogram from 'v-charts/lib/histogram.common'
+import xss from 'xss'
 
 Vue.prototype.$axios = http
+Vue.prototype.$xss = xss
 
 Vue.config.productionTip = false
-
 Vue.use(components)
 Vue.use(ElementUI, {
     size: 'small',

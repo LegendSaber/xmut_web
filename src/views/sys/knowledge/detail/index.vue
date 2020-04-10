@@ -11,7 +11,7 @@
       <span>收藏人数: {{essay.favorNum}}</span>
     </div>
     <el-divider />
-    <div v-html="essay.content" style="fontSize:20px;"></div>
+    <div v-html="$xss(essay.content)" style="fontSize:20px;"></div>
     <el-row v-if="images.length > 0">
       <el-divider />
       <el-col>
@@ -80,7 +80,7 @@
           <el-avatar v-else shape="square" :size="50" :src="comment.img"></el-avatar>
         </el-col>
         <el-col :span="19" :offset="1">
-          <div style="fontSize: 16px;" v-html="comment.content"></div>
+          <div style="fontSize: 16px;" v-html="$xss(comment.content)"></div>
           <div class="comment">
             <span style="color:#3b5998;cursor: pointer;" type="primary">{{comment.author}}</span>
             <el-divider direction="vertical"></el-divider>
@@ -104,7 +104,7 @@
         </el-row>
         <el-row>
           <el-col :span="6" :offset="3">
-            <div style="fontSize: 16px;" v-html="son.content"></div>
+            <div style="fontSize: 16px;" v-html="$xss(son.content)"></div>
           </el-col>
         </el-row>
         <el-row>
@@ -216,6 +216,10 @@ export default {
                         window.addEventListener("scroll", this.windowScroll);
                       }
                     });
+                  }else{
+                    this.$notify.error(response.message)
+                    this.$data.dwloading = false;
+                    this.$data.dialogFormVisible = false;
                   }
                 });
             }, 2000);
@@ -245,6 +249,10 @@ export default {
                         window.addEventListener("scroll", this.windowScroll);
                       }
                     });
+                  } else {
+                    this.$notify.error(response.message)
+                    this.$data.dwloading = false;
+                    this.$data.dialogFormVisible = false;
                   }
                 });
             }, 2000);

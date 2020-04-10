@@ -9,7 +9,7 @@
       <span>收藏人数: {{essay.favorNum}}</span>
     </div>
     <el-divider />
-    <div v-html="essay.content" style="fontSize:20px;"></div>
+    <div v-html="$xss(essay.content)" style="fontSize:20px;"></div> 
     <el-divider />
     <el-button v-if="!isCollect" @click="collect" type="primary" icon="el-icon-star-off" plain>点击收藏</el-button>
     <el-button v-else @click="cancelCollect" type="warning" icon="el-icon-star-on">已收藏</el-button>
@@ -60,7 +60,7 @@
           <el-avatar v-else shape="square" :size="50" :src="comment.img"></el-avatar>
         </el-col>
         <el-col :span="19" :offset="1">
-          <div style="fontSize: 16px;" v-html="comment.content"></div>
+          <div style="fontSize: 16px;" v-html="$xss(comment.content)"></div>
           <div class="comment">
             <span style="color:#3b5998;cursor: pointer;" type="primary">{{comment.author}}</span>
             <el-divider direction="vertical"></el-divider>
@@ -82,7 +82,7 @@
         </el-row>
         <el-row>
           <el-col :span="6" :offset="3">
-            <div style="fontSize: 16px;" v-html="son.content"></div>
+            <div style="fontSize: 16px;" v-html="$xss(son.content)"></div>
           </el-col>
         </el-row>
         <el-row>
@@ -315,6 +315,12 @@ export default {
         .replace(/\n/g, "<br/>")
         .replace(/\s/g, " ");
     },
+    decryptCode(strValue) {
+      return strValue
+        .replace(/<br\s*\/?>/ig,'\r\n')
+        .replace(/<br\s*\/?>/ig,'\n')
+        .replace(/\ \;/g,' ');
+    },
     deteleExperience() {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -411,7 +417,7 @@ export default {
     this.$axios.get("/sysExperience/getExperienceById", getParams).then(response => {
       if (response && response.success) {
         this.$data.essay = response.data;
-        this.$data.essay.createTime = this.$data.essay.createTime.slice(0, 10)
+        this.$data.essay.createTime = this.$data.essay.createTime.slice(0, 10);
         let params = {};
         params.id = this.$data.essay.id;
         this.$axios.get("/collect/getExCollect", params).then(response => {
