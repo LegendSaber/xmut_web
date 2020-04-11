@@ -89,7 +89,8 @@ export default {
           this.$axios.post("/sysUser/login", params)
           .then (response => {
             if (response && response.success){
-              window.sessionStorage.setItem('user', JSON.stringify(response.data))
+              window.sessionStorage.setItem('user', JSON.stringify(response.data.user))
+              window.sessionStorage.setItem('token', response.data.token)
               this.$router.push("/dashbord")
               this.$notify.success(response.message)
             } else{

@@ -7,7 +7,7 @@
             <el-col :offset="9">
               <el-upload
                 class="avatar-uploader"
-                action="http://localhost:8888/xmut/sysUsermanager/saveAvatar"
+                :action="'http://localhost:8888/xmut/sysUsermanager/saveAvatar?token=' + token"
                 :show-file-list="false"
                 :with-credentials="true"
                 :on-success="handleAvatarSuccess"
@@ -52,7 +52,8 @@ export default {
         columns: ["日期", "新增经验贴", "新增知识贴", "新增文件数"],
         rows: [
         ]
-      }
+      },
+      token: ""
     };
   },
   methods: {
@@ -76,6 +77,7 @@ export default {
     }
   },
   created() {
+    this.$data.token = window.sessionStorage.getItem("token")
     let currentUser = JSON.parse(window.sessionStorage.getItem("user"));
     let params = {}
     params.id = currentUser.id

@@ -13,8 +13,16 @@ axiosIns.defaults.withCredentials = true //让ajax携带cookie
 axiosIns.interceptors.request.use(config => {
     config.headers = Object.assign(config.headers, {
         'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
     })
+
+    let token = window.sessionStorage.getItem("token")
+    if (token) {
+        config.headers = Object.assign(config.headers, {
+            'token': token
+        })
+    }
+
     config.data = qs.stringify(config.data)
 
     return config

@@ -7,7 +7,7 @@
     <el-upload
       class="upload-demo"
       :with-credentials="true"
-      action="http://localhost:8888/xmut/sysFile/upload"
+      :action="'http://localhost:8888/xmut/sysFile/upload?token=' + token"
       :show-file-list="false"
       :before-upload="beforeAvatarUpload"
       :on-success="handleAvatarSuccess"
@@ -64,7 +64,8 @@ export default {
         pageSize: 12,
         flag: 1,
         isScroll: false
-      }
+      },
+      token: ""
     };
   },
   methods: {
@@ -167,7 +168,7 @@ export default {
       }
     },
     download(id) {
-      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id)
+      window.open("http://localhost:8888/xmut/sysFile/download?id=" + id + "&token=" + this.$data.token)
     },
     collect(id) {
       let params = {};
@@ -207,6 +208,7 @@ export default {
   },
   created() {
     this.getInitData();
+    this.$data.token = window.sessionStorage.getItem("token")
   },
   beforeDestroy() {
     window.removeEventListener("scroll", this.windowScroll);

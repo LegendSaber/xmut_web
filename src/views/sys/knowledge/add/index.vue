@@ -20,7 +20,7 @@
       <el-form-item style="margin-left: 60px;">
         <div>
           <el-upload
-            action="http://localhost:8888/xmut/sysKnowledge/upload"
+            :action="'http://localhost:8888/xmut/sysKnowledge/upload?token=' + token"
             list-type="picture-card"
             ref="upload"
             :with-credentials="true"
@@ -110,7 +110,8 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      token: ""
     };
   },
   methods: {
@@ -213,6 +214,7 @@ export default {
     }
   },
   created() {
+    this.$data.token = window.sessionStorage.getItem("token")
     if (this.$route.query.id != -1) {
       let currentUser = JSON.parse(window.sessionStorage.getItem("user"));
       this.$data.id = this.$route.query.id;
@@ -246,6 +248,7 @@ export default {
             });
           } else {
             this.$notify.error(response.message);
+            this.$router.push("/knowledge")
           }
         });
     }

@@ -71,6 +71,9 @@ export default {
               this.$router.push("/experience");
             this.$data.ruleForm.title = data.title;
             this.$data.ruleForm.content = this.decryptCode(data.content);
+          } else {
+            this.$notify.error(response.message)
+            this.$router.push("/experience");
           }
         });
     }

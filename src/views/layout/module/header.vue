@@ -161,6 +161,7 @@ export default {
           this.$axios.get("/sysUser/logout", {}).then(response => {
             if (response && response.success) {
               window.sessionStorage.removeItem("user");
+              window.sessionStorage.removeItem("token");
               this.$notify.success(response.message);
               this.$router.push("/");
             }
