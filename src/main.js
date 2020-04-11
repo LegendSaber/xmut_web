@@ -10,9 +10,11 @@ import '@/assets/css/global.css'
 import VeLine from 'v-charts/lib/line.common'
 import VeHistogram from 'v-charts/lib/histogram.common'
 import xss from 'xss'
+import md5 from 'js-md5'
 
 Vue.prototype.$axios = http
 Vue.prototype.$xss = xss
+Vue.prototype.$md5 = md5
 
 Vue.config.productionTip = false
 Vue.use(components)

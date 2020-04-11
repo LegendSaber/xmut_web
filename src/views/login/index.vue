@@ -1,11 +1,18 @@
 <template>
   <div id="login-poster">
-    <el-form class="login-container" label-position="left" label-width="0px">
+    <el-form 
+      :model="loginForm"
+      :rules="rules"
+      status-icon
+      ref="loginForm"
+      class="login-container" 
+      label-position="left" 
+      label-width="0px">
       <h3 class="login_title">用户登录</h3>
-      <el-form-item>
-        <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="账号"></el-input>
+      <el-form-item prop="username">
+        <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="用户名"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="password">
         <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
       </el-form-item>
       <el-select v-model="loginForm.value" placeholder="请选择">
@@ -21,7 +28,7 @@
         <el-button
           type="primary"
           style="width: 100%;background: #505458;border: none"
-          v-on:click="login"
+          v-on:click="login('loginForm')"
         >登录</el-button>
       </el-form-item>
     </el-form>
@@ -38,6 +45,26 @@ export default {
         password: "",
         value: "研友"
       },
+      rules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 3,
+            max: 16,
+            message: "长度在 8 到 16 个字符",
+            trigger: "blur"
+          }
+        ],
+      },
       options: [
         {
           value: "研友",
@@ -51,23 +78,28 @@ export default {
     };
   },
   methods: {
-    login() {
-        let params = {}
-        params.username = this.$data.loginForm.username
-        params.password = this.$data.loginForm.password
-        params.roleName = this.$data.loginForm.value
+    login(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid){
+          let params = {}
+          params.username = this.$data.loginForm.username
+          params.password = this.$md5(this.$data.loginForm.password + "_XmUt")
+          params.roleName = this.$data.loginForm.value
 
-        this.$axios.post("/sysUser/login", params)
-        .then (response => {
-          if (response && response.success){
-            window.sessionStorage.setItem('user', JSON.stringify(response.data))
-            this.$router.push("/dashbord")
-            this.$notify.success(response.message)
-          } else{
-            this.$notify.error(response.message)
-          }
-        }).catch (error => {
-        })
+          this.$axios.post("/sysUser/login", params)
+          .then (response => {
+            if (response && response.success){
+              window.sessionStorage.setItem('user', JSON.stringify(response.data))
+              this.$router.push("/dashbord")
+              this.$notify.success(response.message)
+            } else{
+              this.$notify.error(response.message)
+            }
+          })
+        } else {
+          this.$notify.error("表单信息填写有误!")
+        } 
+      });
     },
     toRegister() {
       this.$router.push("/register");
@@ -81,7 +113,7 @@ export default {
 }
 </script>
  
-<style>
+<style scoped>
 #login-poster {
   background: url("../../assets/images/login.jpg") no-repeat;
   background-position: center;

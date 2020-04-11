@@ -15,7 +15,9 @@
           <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="input" />
         </el-col>
         <el-col :span="1">
-          <a :href="'search?value=' + input"><el-button type="primary" icon="el-icon-search">搜索</el-button></a>
+          <a :href="'search?value=' + input">
+            <el-button type="primary" icon="el-icon-search">搜索</el-button>
+          </a>
         </el-col>
         <el-col :offset="2" :span="2">
           <el-dropdown @command="handleCommand">
@@ -33,40 +35,40 @@
         </el-col>
       </el-row>
     </div>
-      <el-dialog
-        title="修改密码"
-        :visible.sync="dialogFormVisible"
-        :before-close="dialogclose"
-        width="30%"
-        :center="true"
+    <el-dialog
+      title="修改密码"
+      :visible.sync="dialogFormVisible"
+      :before-close="dialogclose"
+      width="30%"
+      :center="true"
+    >
+      <el-form
+        :model="ruleForm"
+        status-icon
+        :rules="rules"
+        ref="ruleForm"
+        label-width="90px"
+        class="demo-ruleForm"
       >
-        <el-form
-          :model="ruleForm"
-          status-icon
-          :rules="rules"
-          ref="ruleForm"
-          label-width="80px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="旧密码:" prop="oldPass">
-            <el-input type="password" v-model="ruleForm.oldPass" autocomplete="off" show-password></el-input>
-          </el-form-item>
-          <el-form-item label="密码:" prop="pass">
-            <el-input type="password" v-model="ruleForm.pass" autocomplete="off" show-password></el-input>
-          </el-form-item>
-          <el-form-item label="确认密码:" prop="checkPass">
-            <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off" show-password></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              v-loading.fullscreen.lock="fullscreenLoading"
-              type="primary"
-              @click="submitForm('ruleForm')"
-            >提交</el-button>
-            <el-button @click="resetForm('ruleForm')">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </el-dialog>
+        <el-form-item label="旧密码:" prop="oldPass">
+          <el-input type="password" v-model="ruleForm.oldPass" autocomplete="off" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="密码:" prop="pass">
+          <el-input type="password" v-model="ruleForm.pass" autocomplete="off" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码:" prop="checkPass">
+          <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off" show-password></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            v-loading.fullscreen.lock="fullscreenLoading"
+            type="primary"
+            @click="submitForm('ruleForm')"
+          >提交</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -115,9 +117,36 @@ export default {
         oldPass: ""
       },
       rules: {
-        pass: [{ validator: validatePass, trigger: "blur" }],
-        checkPass: [{ validator: validatePass2, trigger: "blur" }],
-        oldPass: [{ validator: checkoldPass, trigger: "blur" }]
+        pass: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur"
+          },
+          { validator: validatePass, trigger: "blur" }
+        ],
+        checkPass: [
+          { required: true, message: "请再次输入密码", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur"
+          },
+          { validator: validatePass2, trigger: "blur" }
+        ],
+        oldPass: [
+          { required: true, message: "请输入旧密码", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur"
+          },
+          { validator: checkoldPass, trigger: "blur" }
+        ]
       }
     };
   },
@@ -154,8 +183,8 @@ export default {
             background: "rgba(0, 0, 0, 0.7)"
           });
 
-          params.oldPass = this.$data.ruleForm.oldPass;
-          params.newPass = this.$data.ruleForm.pass;
+          params.oldPass = this.$md5(this.$data.ruleForm.oldPass + "_XmUt");
+          params.newPass = this.$md5(this.$data.ruleForm.pass + "_XmUt");
           setTimeout(() => {
             this.$axios.post("/sysUser/cpassword", params).then(response => {
               loading.close();
@@ -225,10 +254,10 @@ export default {
 
     this.$axios.get("/sysUsermanager/getAvatar").then(response => {
       if (response && response.success) {
-        this.$data.imgUrl = response.data
-        this.$data.isImg = true
+        this.$data.imgUrl = response.data;
+        this.$data.isImg = true;
       }
-    })
+    });
   }
 };
 </script>

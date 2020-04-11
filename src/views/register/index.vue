@@ -1,11 +1,24 @@
 <template>
   <div id="register-poster">
-    <el-form class="register-container" label-position="left" label-width="0px">
+    <el-form
+      :model="registerForm"
+      :rules="rules"
+      ref="registerForm"
+      status-icon
+      class="register-container"
+      label-position="left"
+      label-width="0px"
+    >
       <h3 class="register_title">用户注册</h3>
-      <el-form-item>
-        <el-input type="text" v-model="registerForm.username" auto-complete="off" placeholder="账号"></el-input>
+      <el-form-item prop="username">
+        <el-input 
+          type="text" 
+          v-model="registerForm.username" 
+          auto-complete="off" 
+          placeholder="用户名"
+        ></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="password">
         <el-input
           type="password"
           v-model="registerForm.password"
@@ -13,7 +26,7 @@
           placeholder="密码"
         ></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="repPassword">
         <el-input
           type="password"
           v-model="registerForm.repPassword"
@@ -34,7 +47,7 @@
         <el-button
           type="primary"
           style="width: 100%;background: #505458;border: none"
-          v-on:click="register"
+          v-on:click="register('registerForm')"
         >注册</el-button>
       </el-form-item>
     </el-form>
@@ -52,6 +65,35 @@ export default {
         repPassword: "",
         value: "研友"
       },
+      rules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 8,
+            max: 16,
+            message: "长度在 8 到 16 个字符",
+            trigger: "blur"
+          }
+        ],
+        repPassword: [
+          { required: true, message: "请再次输入密码", trigger: "blur" },
+          {
+            min: 8,
+            max: 16,
+            message: "长度在 8 到 16 个字符",
+            trigger: "blur"
+          }
+        ]
+      },
       options: [
         {
           value: "研友",
@@ -61,48 +103,53 @@ export default {
           value: "路人",
           label: "路人"
         }
-      ],
+      ]
     };
   },
   methods: {
-    register() {
-      if (this.registerForm.password != this.registerForm.repPassword){
-        this.$notify.error("两次密码输入不一致");
-      }else{
-        let params = {}
-        params.username = this.$data.registerForm.username
-        params.password = this.$data.registerForm.password
-        params.roleName = this.$data.registerForm.value
+    register(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          if (this.registerForm.password != this.registerForm.repPassword) {
+            this.$notify.error("两次密码输入不一致");
+            return false;
+          }
+          let params = {};
+          params.username = this.$data.registerForm.username;
+          params.password = this.$md5(
+            this.$data.registerForm.password + "_XmUt"
+          );
+          params.roleName = this.$data.registerForm.value;
 
-        this.$axios.post('/sysUser/register', params)
-        .then(response => {
-          if (response && response.success){
-            this.$alert(response.message, '注册结果', {
-              confirmButtonText: '确定',
-                  callback: action => {  
-                    this.$router.push("/login")
-                  }
-            });   
-          } else {
-            this.$alert(response.message, '注册结果', {
-              confirmButtonText: '确定',
-                  callback: action => {
-                  }
-            });   
-          }   
-        })
-        .catch(error => {
-        });
-      }
+          this.$axios.post("/sysUser/register", params).then(response => {
+            if (response && response.success) {
+              this.$alert(response.message, "注册结果", {
+                confirmButtonText: "确定",
+                callback: action => {
+                  this.$router.push("/login");
+                }
+              });
+            } else {
+              this.$alert(response.message, "注册结果", {
+                confirmButtonText: "确定",
+                callback: action => {}
+              });
+            }
+          });
+        } else {
+          this.$notify.error("表单填写错误!");
+          return false;
+        }
+      });
     },
     toLogin() {
       this.$router.push("/login");
     }
   }
-}
+};
 </script>
  
-<style>
+<style scoped>
 #register-poster {
   background: url("../../assets/images/register.jpg") no-repeat;
   background-position: center;
