@@ -2,8 +2,6 @@
   <div>
     <o-carousel />
     <el-divider />
-    <el-tag style="margin-left:240px;fontSize: 28px" type="warning" plain>迷失的人就迷失了，相遇的人会再相遇。</el-tag>
-    <el-divider />
     <el-upload
       class="upload-demo"
       :with-credentials="true"
@@ -192,10 +190,10 @@ export default {
       let scrollHeight =
         document.documentElement.scrollHeight || document.body.scrollHeight;
 
-      if (scrollTop + windowHeight == scrollHeight && !this.$data.loading) {
+      if (scrollHeight - (scrollTop + windowHeight) <= 1 && !this.$data.loading) {
         this.$data.loading = true;
         setTimeout(() => {
-          document.documentElement.scrollTop = scrollTop - 10;
+          document.documentElement.scrollTop = scrollTop - 3;
           this.$data.queryData.isScroll = true;
           this.getFileData();
           this.$data.loading = false;

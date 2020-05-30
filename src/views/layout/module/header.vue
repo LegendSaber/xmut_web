@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div>
       <el-row>
-        <el-col :span="7" :offset="4">
+        <el-col :span="9" :offset="4">
           <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="主页" name="first"></el-tab-pane>
             <el-tab-pane v-if="currentUser.roleName == '研友'" label="打卡签到区" name="second"></el-tab-pane>
@@ -34,7 +33,6 @@
           <span>{{currentUser.username}}</span>
         </el-col>
       </el-row>
-    </div>
     <el-dialog
       title="修改密码"
       :visible.sync="dialogFormVisible"

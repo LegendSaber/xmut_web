@@ -2,8 +2,6 @@
   <div>
     <o-carousel />
     <el-divider />
-    <el-tag style="margin-left:200px;fontSize: 28px" type="danger" plain>青春是一个短暂的美梦, 当你醒来时, 它早已消失无踪</el-tag>
-    <el-divider />
     <a href="addexperience?id=-1"><el-button
       type="primary"
       style="margin-bottom: 5px"
@@ -144,10 +142,10 @@ export default {
       let scrollHeight =
         document.documentElement.scrollHeight || document.body.scrollHeight;
 
-      if (scrollTop + windowHeight == scrollHeight && !this.$data.loading) {
+      if (scrollHeight - (scrollTop + windowHeight) <= 1 && !this.$data.loading) {
         this.$data.loading = true;
         setTimeout(() => {
-          document.documentElement.scrollTop = scrollTop - 10;
+          document.documentElement.scrollTop = scrollTop - 3;
           this.$data.queryData.isScroll = true;
           this.getExperienceData();
           this.$data.loading = false;
